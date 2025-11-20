@@ -1,0 +1,56 @@
+# IndustryLabs.ai Development Rules
+
+## Project Context
+- B2B AI tools marketplace organized by industry verticals (HR, L&D, CS)
+- Next.js 14 App Router + TypeScript + Tailwind + shadcn/ui
+- Airtable backend (9 tables: TOOLS, VENDORS, REQUESTS, CATEGORIES, ARTICLES, etc.)
+- Target: £5-8K MRR by Month 12 (Yellow Zone success)
+
+## Tech Stack
+- Frontend: Next.js 14, React 18, TypeScript, Tailwind CSS, shadcn/ui
+- Backend: Airtable API (via lib/airtable.ts wrapper)
+- Hosting: Vercel
+- Email: ConvertKit
+- Analytics: Google Analytics 4
+
+## Development Principles (Month 1-3)
+- Use CLIENT COMPONENTS primarily to learn React fundamentals
+- Server Components can be introduced later (Month 4+)
+- Task-based work, not time-based
+- Ship before perfect
+- Focus on HR vertical only until Gate 1 (Month 3)
+
+## Code Style
+- TypeScript strict mode
+- Functional components with hooks
+- Tailwind utility classes (no custom CSS unless necessary)
+- shadcn/ui components for UI primitives
+- Meaningful variable names (no x, y, z)
+
+## File Structure
+- `/app` - Next.js App Router pages and layouts
+- `/app/api` - API routes (e.g., /api/request for form submissions)
+- `/components` - Reusable React components
+- `/lib` - Utilities and API wrappers (airtable.ts)
+- `/public` - Static assets
+- `/types` - TypeScript type definitions
+
+## Key Routes
+- `/` - Homepage
+- `/hr-talent` - HR & Talent category page
+- `/hr-talent/[slug]` - Subcategory pages (e.g., /hr-talent/ats)
+- `/tools/[slug]` - Individual tool detail pages
+- `/articles/[slug]` - Article/blog pages
+- `/request-board` - Request Board form
+- `/api/request` - API endpoint for Request Board submissions
+
+## Airtable Integration
+- All data fetched server-side via lib/airtable.ts
+- Never expose Airtable API key to client
+- Use environment variables for credentials
+- Cache strategies TBD (can implement later)
+
+## Current Phase: Month 0 (Pre-launch)
+- Status: Foundation setup in progress
+- Next milestone: Month 1 (Dec 2025) - 8-10 tools live, 1-3 paying vendors
+- Focus: Build fast, learn React, get to revenue quickly
