@@ -1,41 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-```markdown
 # IndustryLabs.ai
 
 B2B AI tools marketplace organized by industry verticals. Built with Next.js 14, TypeScript, Tailwind CSS, and Airtable.
@@ -43,7 +5,7 @@ B2B AI tools marketplace organized by industry verticals. Built with Next.js 14,
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ (check with `node -v`)
+- Node.js 20+ (check with `node -v`)
 - npm or yarn
 - Airtable account (free tier works)
 - Vercel account (optional, for deployment)
@@ -55,5 +17,113 @@ B2B AI tools marketplace organized by industry verticals. Built with Next.js 14,
 2. Install dependencies:
 ```bash
 npm install
-
 ```
+
+3. Set up environment variables:
+- Copy `.env.example` to `.env.local`
+- Add your Airtable credentials:
+  - `AIRTABLE_API_KEY` - From airtable.com/account
+  - `AIRTABLE_BASE_ID` - From your Airtable base URL
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+```
+industrylabs/
+├── app/                  # Next.js App Router
+│   ├── layout.tsx       # Root layout
+│   ├── page.tsx         # Homepage
+│   ├── hr-talent/       # HR category pages
+│   ├── tools/           # Tool detail pages
+│   ├── articles/        # Blog/article pages
+│   └── api/             # API routes
+├── components/          # Reusable React components
+│   └── ui/             # shadcn/ui components
+├── lib/                # Utilities and API wrappers
+│   └── airtable.ts     # Airtable API wrapper
+├── types/              # TypeScript type definitions
+├── public/             # Static assets
+└── .env.local          # Environment variables (not committed)
+```
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Backend**: Airtable (API)
+- **Hosting**: Vercel
+- **Email**: ConvertKit
+- **Analytics**: Google Analytics 4
+
+## AI-Assisted Development
+
+> **Development Workflow:** This repo uses a dual-AI approach:
+> - **Claude Code** (VS Code extension with Sonnet 4.5) for multi-file edits and implementation
+> - **GPT-5 / Latest GPT Models** (ChatGPT, OpenAI Codex) for planning, architecture, and code review
+> - **Other assistants** (e.g., Gemini, Claude.ai) for additional review and validation
+
+**Quick Reference:**
+- Architecture & Planning → GPT-5
+- Code Implementation → Claude Code (VS Code)
+- Code Review → GPT-5
+- Security & Critical Logic → Cross-check with multiple models
+
+**For AI Assistants Helping With This Project:**
+- Treat the GitHub repo as the canonical source of truth
+- Explicitly state your role: PLAN / IMPLEMENT / REVIEW
+- Never paste secrets or API keys in prompts
+- Follow the patterns in `.cursorrules` and `AI_WORKFLOW.md`
+
+## Development
+
+### Running Locally
+```bash
+npm run dev
+```
+
+### Building for Production
+```bash
+npm run build
+npm start
+```
+
+### Code Quality
+```bash
+npm run lint
+```
+
+## Deployment
+
+This project is configured for Vercel deployment:
+
+1. Connect your GitHub repo to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+## Documentation
+
+Full project documentation is available in the Claude Project:
+- Master Plan - Overall strategy and goals
+- Execution Hub - Current tasks and progress
+- Airtable Schema - Database structure
+- Decision Log - Key technical decisions
+- Resources - Templates and scripts
+- AI Workflow - Development process with AI tools
+
+## Current Status
+
+**Phase**: Month 0 (Pre-launch)  
+**Focus**: Foundation setup, Next.js build  
+**Target Launch**: Week 4-5  
+**Next Task**: TASK-007 (Airtable wrapper implementation)
+
+## License
+
+Proprietary - All rights reserved

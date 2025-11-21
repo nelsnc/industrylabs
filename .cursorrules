@@ -54,3 +54,43 @@
 - Status: Foundation setup in progress
 - Next milestone: Month 1 (Dec 2025) - 8-10 tools live, 1-3 paying vendors
 - Focus: Build fast, learn React, get to revenue quickly
+
+## AI Assistant Strategy
+
+IndustryLabs uses multiple AI coding assistants in combination:
+
+**Primary Tools:**
+- **Claude Code** (VS Code extension) - Claude Sonnet 4.5 for autonomous coding
+  - Multi-file navigation and edits inside the repo
+  - Implementing features in existing code structure
+  - Refactors, migrations, and repetitive boilerplate work
+  
+- **GPT-5 / Latest GPT Models** (ChatGPT, OpenAI Codex) - for high-level reasoning
+  - System design, architecture decisions, and trade-off analysis
+  - Complex TypeScript typing, API design, and edge-case reasoning
+  - Generating or reviewing important docs (README, ADRs, specs)
+
+**Optional:**
+- **Other models** (e.g., Gemini, Claude.ai) for cross-checking tricky logic or security-sensitive flows
+
+**Rules for Any AI Assistant:**
+
+1. **Source of Truth:** The GitHub repo is the single source of truth. Never assume files that don't exist.
+
+2. **Task Allocation:** When proposing work, explicitly state which assistant should handle which part:
+   - "Use Claude Code in VS Code to apply these multi-file changes"
+   - "Use GPT-5 to review the architecture and suggest improvements"
+
+3. **Security:** Never expose or hard-code secrets. All credentials live in `.env.local` and are never pasted into AI chats.
+
+4. **Incremental Changes:** Prefer small, incremental changes with clear commit messages over large unreviewed rewrites.
+
+5. **Assistant Roles:** Clearly state whether you are in PLAN, IMPLEMENT, or REVIEW mode.
+
+**Development Workflow:**
+1. **Planning** → Use GPT-5 for architecture, breaking down tasks, identifying risks
+2. **Implementation** → Use Claude Code for file creation, multi-file edits, refactoring
+3. **Review** → Use GPT-5 for code review, naming suggestions, test recommendations
+4. **Cross-check** → Optionally use other models for critical paths
+
+Development is done using BOTH Claude Code (for in-repo edits) and GPT-5/latest GPT models (for planning/review). Any AI assistant should explicitly state which role it is playing.
