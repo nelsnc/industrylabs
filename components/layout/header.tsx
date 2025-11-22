@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Container } from "./container";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -53,22 +53,23 @@ export function Header() {
           {/* Mobile Navigation */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover:bg-accent">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <nav className="flex flex-col space-y-4">
+              <SheetTitle className="mb-6">Menu</SheetTitle>
+              <nav className="flex flex-col space-y-2">
                 {navigation.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
                     className={cn(
-                      "text-lg transition-colors hover:text-primary",
+                      "text-lg py-3 px-4 rounded-md transition-colors hover:bg-accent hover:text-primary",
                       pathname === item.href
-                        ? "text-primary font-semibold"
+                        ? "text-primary font-semibold bg-primary/10 border-l-4 border-primary"
                         : "text-muted-foreground"
                     )}
                   >
