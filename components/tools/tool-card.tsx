@@ -9,7 +9,7 @@ type ToolCardProps = {
 
 export function ToolCard({ tool }: ToolCardProps) {
   return (
-    <Link href="#" data-slug={tool.slug} className="block h-full">
+    <Link href={`/tools/${tool.slug}`} className="block h-full">
       <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
