@@ -19,7 +19,12 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { requestSchema, type RequestFormValues } from "@/lib/validation/request";
 import type { RequestApiResponse } from "@/lib/types/request";
 
-const initialValues: RequestFormValues = {
+// Form state type - allows gdprConsent to be boolean during editing
+type FormState = Omit<RequestFormValues, "gdprConsent"> & {
+  gdprConsent: boolean;
+};
+
+const initialValues: FormState = {
   requesterName: "",
   requesterEmail: "",
   requesterCompany: "",
@@ -38,13 +43,13 @@ const initialValues: RequestFormValues = {
 };
 
 export function RequestFormNew() {
-  const [values, setValues] = useState<RequestFormValues>(initialValues);
-  const [errors, setErrors] = useState<Partial<Record<keyof RequestFormValues, string>>>({});
+  const [values, setValues] = useState<FormState>(initialValues);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const handleChange = (field: keyof RequestFormValues) => (
+  const handleChange = (field: keyof FormState) => (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setValues((v) => ({ ...v, [field]: e.target.value }));
@@ -53,15 +58,15 @@ export function RequestFormNew() {
     }
   };
 
-  const handleSelectChange = (field: keyof RequestFormValues) => (value: string) => {
+  const handleSelectChange = (field: keyof FormState) => (value: string) => {
     setValues((v) => ({ ...v, [field]: value }));
     if (errors[field]) {
       setErrors((e) => ({ ...e, [field]: undefined }));
     }
   };
 
-  const handleCheckboxChange = (checked: boolean) => {
-    setValues((v) => ({ ...v, gdprConsent: checked }));
+  const handleCheckboxChange = (checked: boolean | "indeterminate") => {
+    setValues((v) => ({ ...v, gdprConsent: checked === true }));
     if (errors.gdprConsent) {
       setErrors((e) => ({ ...e, gdprConsent: undefined }));
     }
@@ -79,9 +84,9 @@ export function RequestFormNew() {
 
     const result = requestSchema.safeParse(submitValues);
     if (!result.success) {
-      const fieldErrors: Partial<Record<keyof RequestFormValues, string>> = {};
+      const fieldErrors: Partial<Record<keyof FormState, string>> = {};
       for (const issue of result.error.issues) {
-        const fieldName = issue.path[0] as keyof RequestFormValues;
+        const fieldName = issue.path[0] as keyof FormState;
         if (!fieldErrors[fieldName]) {
           fieldErrors[fieldName] = issue.message;
         }
@@ -104,9 +109,10 @@ export function RequestFormNew() {
       const data: RequestApiResponse = await res.json();
 
       if (!res.ok || !data.success) {
-        setSubmitError(data.error || "Failed to submit request");
-        if ("fieldErrors" in data && data.fieldErrors) {
-          setErrors(data.fieldErrors as Partial<Record<keyof RequestFormValues, string>>);
+        const errorMessage = !data.success ? data.error : "Failed to submit request";
+        setSubmitError(errorMessage);
+        if (!data.success && data.fieldErrors) {
+          setErrors(data.fieldErrors as Partial<Record<keyof FormState, string>>);
         }
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
