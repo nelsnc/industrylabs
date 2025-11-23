@@ -21,24 +21,37 @@ function formatZodErrors(error: z.ZodError): Record<string, string> {
 
 // Helper: Map frontend payload to Airtable fields (camelCase → snake_case)
 function mapToAirtableFields(values: RequestFormValues) {
-  return {
+  // Combine use case and requirements into a single requirements field
+  const combinedRequirements = values.useCase
+    ? `USE CASE:\n${values.useCase}\n\nREQUIREMENTS:\n${values.requirements}`
+    : values.requirements;
+
+  const fields: Record<string, unknown> = {
     requester_name: values.requesterName,
     requester_email: values.requesterEmail,
     requester_company: values.requesterCompany,
     company_size: values.companySize,
-    company_location: values.companyLocation,
     vertical: values.vertical,
-    use_case: values.useCase,
-    budget_range: values.budgetRange,
     timeline: values.timeline,
-    current_tools: values.currentTools,
-    requirements: values.requirements,
-    compliance_needs: values.complianceNeeds,
+    requirements: combinedRequirements,
     gdpr_consent: values.gdprConsent,
     source_channel: values.sourceChannel || "Direct",
-    request_source_url: values.requestSourceUrl,
     status: "New",
   };
+
+  // Add optional fields only if they have values
+  if (values.companyLocation) fields.company_location = values.companyLocation;
+  if (values.budgetRange) fields.budget_range = values.budgetRange;
+  if (values.currentTools) fields.current_tools = values.currentTools;
+  if (values.requestSourceUrl) fields.request_source_url = values.requestSourceUrl;
+
+  // compliance_needs appears to be a linked record field - only add if not empty
+  if (values.complianceNeeds && values.complianceNeeds.length > 0) {
+    // For now, skip this field as we don't know the record IDs
+    // TODO: Map compliance need names to Airtable record IDs
+  }
+
+  return fields;
 }
 
 export async function POST(req: NextRequest) {
