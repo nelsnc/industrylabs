@@ -264,8 +264,18 @@ async function airtableFetch<T = unknown>(
   params?: AirtableQueryParams,
   options?: RequestInit
 ): Promise<T> {
+  const DEBUG = process.env.DEBUG_AIRTABLE === 'true';
+
   // Get credentials (validates environment variables)
   const { apiKey, baseId } = getAirtableCredentials();
+
+  if (DEBUG) {
+    console.log('\n[DEBUG] airtableFetch called');
+    console.log('[DEBUG] Table:', tableName);
+    console.log('[DEBUG] Base ID:', baseId);
+    console.log('[DEBUG] API Key:', apiKey.substring(0, 10) + '...');
+    console.log('[DEBUG] Params:', JSON.stringify(params, null, 2));
+  }
 
   // Build URL with query parameters
   const url = new URL(`${AIRTABLE_BASE_URL}/${baseId}/${tableName}`);
@@ -293,6 +303,10 @@ async function airtableFetch<T = unknown>(
     }
   }
 
+  if (DEBUG) {
+    console.log('[DEBUG] Full URL:', url.toString());
+  }
+
   // Prepare fetch options
   const fetchOptions: RequestInit = {
     ...options,
@@ -303,14 +317,38 @@ async function airtableFetch<T = unknown>(
     },
   };
 
+  if (DEBUG) {
+    console.log('[DEBUG] Request method:', fetchOptions.method || 'GET');
+    console.log('[DEBUG] Request headers:', JSON.stringify({
+      ...fetchOptions.headers,
+      'Authorization': 'Bearer ***'
+    }, null, 2));
+  }
+
   try {
+    if (DEBUG) {
+      console.log('[DEBUG] Sending request...');
+    }
+
     const response = await fetch(url.toString(), fetchOptions);
+
+    if (DEBUG) {
+      console.log('[DEBUG] Response status:', response.status);
+      console.log('[DEBUG] Response statusText:', response.statusText);
+      console.log('[DEBUG] Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+    }
 
     // Parse response body
     let responseData: unknown;
     try {
       responseData = await response.json();
-    } catch {
+      if (DEBUG) {
+        console.log('[DEBUG] Response body:', JSON.stringify(responseData, null, 2));
+      }
+    } catch (parseError) {
+      if (DEBUG) {
+        console.error('[DEBUG] JSON parse error:', parseError);
+      }
       // If JSON parsing fails, throw a generic error
       throw new AirtableError(
         'Failed to parse Airtable response',
@@ -325,6 +363,13 @@ async function airtableFetch<T = unknown>(
       const errorMessage = errorResponse?.error?.message || 'Airtable request failed';
       const errorCode = errorResponse?.error?.type || 'UNKNOWN_ERROR';
 
+      if (DEBUG) {
+        console.error('[DEBUG] Request failed!');
+        console.error('[DEBUG] Error message:', errorMessage);
+        console.error('[DEBUG] Error code:', errorCode);
+        console.error('[DEBUG] Error details:', JSON.stringify(responseData, null, 2));
+      }
+
       throw new AirtableError(
         errorMessage,
         response.status,
@@ -333,8 +378,16 @@ async function airtableFetch<T = unknown>(
       );
     }
 
+    if (DEBUG) {
+      console.log('[DEBUG] Request successful!');
+    }
+
     return responseData as T;
   } catch (error) {
+    if (DEBUG) {
+      console.error('[DEBUG] Caught error in airtableFetch:', error);
+    }
+
     // Re-throw AirtableError as-is
     if (error instanceof AirtableError) {
       throw error;
@@ -428,6 +481,12 @@ function mapCategoryRecord(record: AirtableRecord<CategoryFields>): Category {
  * @throws {AirtableError} If the request fails
  */
 export async function getTools(): Promise<Tool[]> {
+  const DEBUG = process.env.DEBUG_AIRTABLE === 'true';
+
+  if (DEBUG) {
+    console.log('\n[DEBUG] getTools() called');
+  }
+
   const response = await airtableFetch<AirtableListResponse<ToolFields>>(
     'TOOLS',
     {
@@ -435,6 +494,10 @@ export async function getTools(): Promise<Tool[]> {
       sort: [{ field: 'date_added', direction: 'desc' }],
     }
   );
+
+  if (DEBUG) {
+    console.log('[DEBUG] getTools() received', response.records.length, 'records');
+  }
 
   return response.records.map(mapToolRecord);
 }
@@ -633,4 +696,54 @@ export async function createRequest(data: CreateRequestInput): Promise<string> {
   );
 
   return response.id;
+}
+
+// =============================================================================
+// Test Connection Function
+// =============================================================================
+
+/**
+ * Helper function to get all records from a table (for testing)
+ * Fetches all records without filtering
+ *
+ * @param tableName - The name of the table to fetch from
+ * @returns Array of raw Airtable records
+ */
+async function getAllRecords<T>(tableName: string): Promise<AirtableRecord<T>[]> {
+  const response = await airtableFetch<AirtableListResponse<T>>(tableName);
+  return response.records;
+}
+
+/**
+ * Test connection to Airtable
+ *
+ * Attempts to fetch records from the TOOLS table and logs connection details.
+ * Useful for debugging and verifying Airtable configuration.
+ *
+ * @returns An object indicating success/failure and record count
+ */
+export async function testConnection() {
+  try {
+    console.log("🔍 Testing Airtable connection...");
+    console.log("Base ID:", process.env.AIRTABLE_BASE_ID?.substring(0, 10) + "...");
+
+    const records = await getAllRecords<ToolFields>("TOOLS");
+
+    console.log("✅ Connection successful!");
+    console.log(`Found ${records.length} tools in TOOLS table`);
+
+    if (records.length > 0) {
+      console.log("\nFirst tool sample:");
+      const first = records[0];
+      console.log("- ID:", first.id);
+      console.log("- Fields:", Object.keys(first.fields));
+      console.log("- Tool name:", first.fields.tool_name);
+      console.log("- Tool slug:", first.fields.tool_slug);
+    }
+
+    return { success: true, count: records.length };
+  } catch (error) {
+    console.error("❌ Connection failed:", error);
+    return { success: false, error };
+  }
 }

@@ -260,6 +260,13 @@ async function runTests(): Promise<void> {
   console.log('\n🧪 Starting Airtable Integration Tests');
   console.log('━'.repeat(60));
 
+  // Debug environment variables
+  console.log('\n[ENV CHECK]');
+  console.log('AIRTABLE_API_KEY:', process.env.AIRTABLE_API_KEY ? `${process.env.AIRTABLE_API_KEY.substring(0, 10)}... (${process.env.AIRTABLE_API_KEY.length} chars)` : 'NOT SET');
+  console.log('AIRTABLE_BASE_ID:', process.env.AIRTABLE_BASE_ID || 'NOT SET');
+  console.log('DEBUG_AIRTABLE:', process.env.DEBUG_AIRTABLE || 'false');
+  console.log('━'.repeat(60));
+
   const startTime = Date.now();
 
   // Run all tests sequentially
