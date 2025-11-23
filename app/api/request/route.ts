@@ -43,7 +43,7 @@ function mapToAirtableFields(values: RequestFormValues) {
   if (values.companyLocation) fields.company_location = values.companyLocation;
   if (values.budgetRange) fields.budget_range = values.budgetRange;
   if (values.currentTools) fields.current_tools = values.currentTools;
-  if (values.requestSourceUrl) fields.request_source_url = values.requestSourceUrl;
+  // Note: request_source_url field doesn't exist in Airtable schema
 
   // compliance_needs appears to be a linked record field - only add if not empty
   if (values.complianceNeeds && values.complianceNeeds.length > 0) {
