@@ -21,9 +21,9 @@ function formatZodErrors(error: z.ZodError): Record<string, string> {
 
 // Helper: Map frontend payload to Airtable fields (camelCase → snake_case)
 function mapToAirtableFields(values: RequestFormValues) {
-  // Combine use case and requirements into a single requirements field
+  // Combine use case and requirements into a single requirements field with clear formatting
   const combinedRequirements = values.useCase
-    ? `USE CASE:\n${values.useCase}\n\nREQUIREMENTS:\n${values.requirements}`
+    ? `USE CASE:\n${values.useCase}\n\n${"=".repeat(50)}\n\nDETAILED REQUIREMENTS:\n${values.requirements}`
     : values.requirements;
 
   const fields: Record<string, unknown> = {
@@ -43,7 +43,9 @@ function mapToAirtableFields(values: RequestFormValues) {
   if (values.companyLocation) fields.company_location = values.companyLocation;
   if (values.budgetRange) fields.budget_range = values.budgetRange;
   if (values.currentTools) fields.current_tools = values.currentTools;
-  // Note: request_source_url field doesn't exist in Airtable schema
+  // Note: request_source_url field doesn't exist in current Airtable schema
+  // TODO: Add this field to Airtable REQUESTS table if needed for SEO attribution
+  // if (values.requestSourceUrl) fields.request_source_url = values.requestSourceUrl;
 
   // compliance_needs appears to be a linked record field - only add if not empty
   if (values.complianceNeeds && values.complianceNeeds.length > 0) {

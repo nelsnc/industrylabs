@@ -77,9 +77,38 @@ export function RequestFormNew() {
     setSubmitError(null);
     setSubmitSuccess(false);
 
+    // Auto-detect source channel from URL params or referrer
+    const detectSourceChannel = (): "Direct" | "SEO" | "LinkedIn" | "Referral" | "Other" => {
+      if (typeof window === "undefined") return "Direct";
+
+      // Check URL parameter ?source=xxx
+      const params = new URLSearchParams(window.location.search);
+      const sourceParam = params.get("source");
+      if (sourceParam) {
+        const validSources = ["Direct", "SEO", "LinkedIn", "Referral", "Other"] as const;
+        const normalized = (sourceParam.charAt(0).toUpperCase() + sourceParam.slice(1).toLowerCase()) as typeof validSources[number];
+        if (validSources.includes(normalized)) {
+          return normalized;
+        }
+      }
+
+      // If no URL parameter, check referrer
+      const referrer = document.referrer;
+      if (!referrer || referrer.includes(window.location.hostname)) {
+        return "Direct";
+      } else if (referrer.includes("google.com") || referrer.includes("bing.com")) {
+        return "SEO";
+      } else if (referrer.includes("linkedin.com")) {
+        return "LinkedIn";
+      } else {
+        return "Referral";
+      }
+    };
+
     const submitValues = {
       ...values,
       requestSourceUrl: typeof window !== "undefined" ? window.location.href : "",
+      sourceChannel: detectSourceChannel(),
     };
 
     const result = requestSchema.safeParse(submitValues);

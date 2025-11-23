@@ -68,12 +68,12 @@ export async function sendNewRequestEmail(params: NewRequestEmailParams) {
 
         <h3>💡 Use Case</h3>
         <div class="info-box">
-          <p>${values.useCase}</p>
+          <p style="white-space: pre-wrap;">${values.useCase}</p>
         </div>
 
-        <h3>📝 Requirements</h3>
+        <h3>📝 Detailed Requirements</h3>
         <div class="info-box">
-          <p>${values.requirements}</p>
+          <p style="white-space: pre-wrap;">${values.requirements}</p>
         </div>
 
         ${values.currentTools ? `
@@ -107,9 +107,10 @@ export async function sendNewRequestEmail(params: NewRequestEmailParams) {
 New Request Board Submission
 
 Request ID: ${requestId}
-Submitted: ${new Date().toLocaleString()}
+Submitted: ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}
 
 BUYER DETAILS
+=============
 Name: ${values.requesterName}
 Email: ${values.requesterEmail}
 Company: ${values.requesterCompany}
@@ -117,19 +118,22 @@ Company Size: ${values.companySize}
 ${values.companyLocation ? `Location: ${values.companyLocation}` : ""}
 
 REQUEST DETAILS
+===============
 Vertical: ${values.vertical}
 Timeline: ${values.timeline}
-${values.budgetRange ? `Budget: ${values.budgetRange}` : ""}
+${values.budgetRange ? `Budget: ${values.budgetRange}/month` : ""}
 
 USE CASE
+========
 ${values.useCase}
 
-REQUIREMENTS
+DETAILED REQUIREMENTS
+=====================
 ${values.requirements}
 
-${values.currentTools ? `CURRENT TOOLS\n${values.currentTools}` : ""}
-${values.complianceNeeds?.length ? `COMPLIANCE NEEDS\n${values.complianceNeeds.join(", ")}` : ""}
-${values.requestSourceUrl ? `Source URL: ${values.requestSourceUrl}` : ""}
+${values.currentTools ? `CURRENT TOOLS\n${"=".repeat(20)}\n${values.currentTools}\n` : ""}
+${values.complianceNeeds?.length ? `\nCOMPLIANCE NEEDS\n${"=".repeat(20)}\n${values.complianceNeeds.join(", ")}\n` : ""}
+${values.requestSourceUrl ? `\nSOURCE URL: ${values.requestSourceUrl}` : ""}
 
 ---
 Find this request in Airtable REQUESTS table using Request ID: ${requestId}
