@@ -16,7 +16,7 @@ function formatDate(dateString: string): string {
 
 export default async function ArticlesPage() {
   // Fetch articles from Airtable with fallback
-  let articles;
+  let articles: Awaited<ReturnType<typeof getAllArticles>>;
   try {
     articles = await getAllArticles();
 

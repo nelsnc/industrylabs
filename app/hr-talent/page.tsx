@@ -7,7 +7,7 @@ import { hrTools as mockHrTools } from "@/lib/mock-data";
 
 export default async function HrTalentPage() {
   // Fetch HR tools from Airtable with fallback
-  let tools;
+  let tools: Awaited<ReturnType<typeof getToolsByVertical>>;
   try {
     tools = await getToolsByVertical("HR & Talent");
 

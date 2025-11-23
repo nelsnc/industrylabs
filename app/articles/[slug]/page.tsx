@@ -24,7 +24,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
 
   // Fetch article from Airtable
-  let article;
+  let article: Awaited<ReturnType<typeof getArticleBySlug>> = null;
   try {
     article = await getArticleBySlug(slug);
   } catch (error) {
@@ -37,7 +37,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   // Get related tools
-  let relatedTools;
+  let relatedTools: Awaited<ReturnType<typeof getRelatedToolsForArticle>> = [];
   try {
     relatedTools = await getRelatedToolsForArticle(article);
   } catch (error) {

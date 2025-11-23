@@ -17,7 +17,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
   const { slug } = await params;
 
   // Fetch tool from Airtable
-  let tool;
+  let tool: Awaited<ReturnType<typeof getToolBySlug>> = null;
   try {
     tool = await getToolBySlug(slug);
   } catch (error) {
@@ -30,7 +30,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
   }
 
   // Get related articles (first 3 for now)
-  let articles;
+  let articles: Awaited<ReturnType<typeof getAllArticles>> = [];
   try {
     const allArticles = await getAllArticles();
     articles = allArticles.slice(0, 3);
