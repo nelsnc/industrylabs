@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { hrTools } from "@/lib/mock-data";
-import { ExternalLink } from "lucide-react";
+import { hrTools, articles } from "@/lib/mock-data";
+import { ExternalLink, ArrowRight } from "lucide-react";
 
 interface ToolPageProps {
   params: Promise<{
@@ -188,6 +188,35 @@ export default async function ToolPage({ params }: ToolPageProps) {
             )}
           </div>
         </div>
+
+        <Separator className="my-12" />
+
+        {/* Related Articles */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6">Related Insights</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {articles.slice(0, 3).map((article) => (
+              <Card key={article.id} className="p-6 hover:shadow-lg transition-shadow">
+                <Badge className="bg-secondary/10 text-secondary-foreground border border-secondary/20 mb-3">
+                  {article.category}
+                </Badge>
+                <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                  {article.title}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {article.excerpt}
+                </p>
+                <Link
+                  href={`/articles/${article.slug}`}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                >
+                  Read more
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </section>
 
         <Separator className="my-12" />
 

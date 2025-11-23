@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ArrowRight } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -93,6 +95,21 @@ export default function AboutPage() {
             integration mapping, and use case documentation before we move to the next.
           </p>
         </section>
+
+        {/* Articles CTA */}
+        <div className="mt-12 rounded-lg border bg-muted/50 p-8 text-center">
+          <h3 className="text-lg font-semibold mb-2">Want to learn more?</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Read our insights and guides on HR AI tools
+          </p>
+          <Link
+            href="/articles"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            Browse Articles
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
     </Container>
   );

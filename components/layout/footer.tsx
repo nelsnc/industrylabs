@@ -16,6 +16,10 @@ export function Footer() {
             <Link href="/request" className="transition-colors hover:text-primary">
               Request Board
             </Link>
+            <span className="hidden text-muted-foreground md:inline">·</span>
+            <Link href="/articles" className="transition-colors hover:text-primary">
+              Insights & Guides
+            </Link>
             <span className="text-xs">Privacy (coming soon)</span>
             <span className="text-xs">LinkedIn (coming soon)</span>
           </nav>
