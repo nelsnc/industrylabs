@@ -699,6 +699,34 @@ export async function createRequest(data: CreateRequestInput): Promise<string> {
 }
 
 // =============================================================================
+// Generic Create Record Function
+// =============================================================================
+
+/**
+ * Creates a new record in any Airtable table
+ *
+ * @param tableName - The name of the Airtable table
+ * @param fields - The fields to create
+ * @returns The created record with ID
+ * @throws {AirtableError} If the Airtable request fails
+ */
+export async function createRecord<T = unknown>(
+  tableName: string,
+  fields: Record<string, unknown>
+): Promise<AirtableRecord<T>> {
+  const response = await airtableFetch<AirtableRecord<T>>(
+    tableName,
+    undefined,
+    {
+      method: 'POST',
+      body: JSON.stringify({ fields }),
+    }
+  );
+
+  return response;
+}
+
+// =============================================================================
 // Test Connection Function
 // =============================================================================
 
