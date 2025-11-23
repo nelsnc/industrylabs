@@ -1,7 +1,12 @@
+import Link from "next/link";
 import { ToolCard } from "@/components/tools/tool-card";
-import { featuredTools } from "@/lib/mock-data";
+import type { Tool } from "@/lib/airtable-helpers";
 
-export function HomeFeaturedTools() {
+interface HomeFeaturedToolsProps {
+  tools: Tool[];
+}
+
+export function HomeFeaturedTools({ tools }: HomeFeaturedToolsProps) {
   return (
     <section className="py-12 md:py-16">
       <div className="mb-8">
@@ -12,9 +17,18 @@ export function HomeFeaturedTools() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {featuredTools.map((tool) => (
+        {tools.map((tool) => (
           <ToolCard key={tool.id} tool={tool} />
         ))}
+      </div>
+
+      <div className="mt-8 text-center">
+        <Link
+          href="/hr-talent"
+          className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+        >
+          View all HR tools →
+        </Link>
       </div>
     </section>
   );
