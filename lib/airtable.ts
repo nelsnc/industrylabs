@@ -709,7 +709,7 @@ export async function createRequest(data: CreateRequestInput): Promise<string> {
  * @param tableName - The name of the table to fetch from
  * @returns Array of raw Airtable records
  */
-async function getAllRecords<T>(tableName: string): Promise<AirtableRecord<T>[]> {
+export async function getAllRecords<T>(tableName: string): Promise<AirtableRecord<T>[]> {
   const response = await airtableFetch<AirtableListResponse<T>>(tableName);
   return response.records;
 }

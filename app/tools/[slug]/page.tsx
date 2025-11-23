@@ -2,164 +2,216 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { hrTools, articles } from "@/lib/mock-data";
-import { ExternalLink, ArrowRight } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { getToolBySlug, getAllArticles } from "@/lib/airtable-helpers";
 
-interface ToolPageProps {
-  params: Promise<{
-    slug: string;
-  }>;
-}
+type ToolPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 export default async function ToolPage({ params }: ToolPageProps) {
   const { slug } = await params;
-  const tool = hrTools.find((t) => t.slug === slug);
+
+  // Fetch tool from Airtable
+  let tool;
+  try {
+    tool = await getToolBySlug(slug);
+  } catch (error) {
+    console.error("Error fetching tool from Airtable:", error);
+    tool = null;
+  }
 
   if (!tool) {
-    notFound();
+    return notFound();
+  }
+
+  // Get related articles (first 3 for now)
+  let articles;
+  try {
+    const allArticles = await getAllArticles();
+    articles = allArticles.slice(0, 3);
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    articles = [];
   }
 
   return (
-    <Container>
-      <div className="py-12 md:py-16">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "HR & Talent", href: "/hr-talent" },
-            { label: tool.name },
-          ]}
-        />
+    <Container className="py-10 md:py-12">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "HR & Talent", href: "/hr-talent" },
+          { label: tool.name },
+        ]}
+      />
 
-        {/* Tool Header */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_auto] md:items-start mb-12">
-          <div className="flex items-start gap-6">
-            <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center">
-              <span className="text-3xl font-semibold text-primary">
-                {tool.name.charAt(0)}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-4xl font-bold mb-2">{tool.name}</h1>
-              {tool.tagline && (
-                <p className="text-xl text-muted-foreground">{tool.tagline}</p>
-              )}
+      {/* Tool Header */}
+      <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        {/* Left: Tool Info */}
+        <div className="flex-1">
+          <div className="flex items-center gap-4">
+            {tool.logoUrl ? (
+              <img
+                src={tool.logoUrl}
+                alt={`${tool.name} logo`}
+                className="h-16 w-16 rounded-lg border object-cover"
+              />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-lg border bg-muted">
+                <span className="text-2xl font-bold text-primary">
+                  {tool.name.charAt(0)}
+                </span>
+              </div>
+            )}
+            <div>
+              <h1 className="mb-2">{tool.name}</h1>
+              <p className="text-lg text-muted-foreground">
+                {tool.tagline || tool.shortDescription}
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground mb-1">Pricing</p>
-              <p className="text-2xl font-semibold">{tool.pricing}</p>
-            </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {tool.tags.map((tag) => (
+              <Badge key={tag} variant="outline">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: CTA */}
+        <Card className="w-full md:w-80">
+          <CardHeader>
+            <CardTitle className="text-lg">Pricing</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-2xl font-semibold">{tool.pricing}</p>
             {tool.websiteUrl && (
-              <Button asChild size="lg" className="w-full md:w-auto">
-                <Link href={tool.websiteUrl} target="_blank" rel="noopener noreferrer">
+              <Button asChild className="w-full">
+                <Link
+                  href={tool.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Visit Website
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             )}
-          </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="my-12" />
+
+      {/* Tool Details */}
+      <div className="grid gap-12 lg:grid-cols-[1fr_320px]">
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Description */}
+          <section>
+            <h2 className="mb-4">About {tool.name}</h2>
+            <div className="prose prose-slate max-w-none">
+              <p className="text-muted-foreground">
+                {tool.fullDescription || tool.shortDescription}
+              </p>
+            </div>
+          </section>
+
+          {/* Features */}
+          {tool.features && tool.features.length > 0 && (
+            <section>
+              <h2 className="mb-4">Key Features</h2>
+              <ul className="list-inside list-disc space-y-2 text-muted-foreground">
+                {tool.features.map((feature, index) => (
+                  <li key={index}>{feature}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Detailed Pricing */}
+          {tool.detailedPricing && (
+            <section>
+              <h2 className="mb-4">Pricing Details</h2>
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-muted-foreground">{tool.detailedPricing}</p>
+                </CardContent>
+              </Card>
+            </section>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Full Description */}
-            {tool.fullDescription && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Overview</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {tool.fullDescription}
-                </p>
-              </section>
-            )}
-
-            {/* Key Features */}
-            {tool.features && tool.features.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Key Features</h2>
-                <ul className="space-y-3">
-                  {tool.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
+        {/* Sidebar */}
+        <aside className="space-y-6">
+          {/* Company Size Fit */}
+          {tool.companySizeFit && tool.companySizeFit.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Company Size Fit</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {tool.companySizeFit.map((size) => (
+                    <Badge key={size} variant="outline">
+                      {size} employees
+                    </Badge>
                   ))}
-                </ul>
-              </section>
-            )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Detailed Pricing */}
-            {tool.detailedPricing && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Pricing Details</h2>
-                <Card className="p-6">
-                  <p className="text-muted-foreground">{tool.detailedPricing}</p>
-                </Card>
-              </section>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Compliance Tags */}
-            {tool.complianceTags && tool.complianceTags.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Compliance</h3>
+          {/* Compliance */}
+          {tool.complianceTags && tool.complianceTags.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Compliance</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {tool.complianceTags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      className="bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-100"
-                    >
+                    <Badge key={tag} variant="outline">
                       {tag}
                     </Badge>
                   ))}
                 </div>
-              </Card>
-            )}
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Integration Tags */}
-            {tool.integrationTags && tool.integrationTags.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Integrations</h3>
+          {/* Integrations */}
+          {tool.integrationTags && tool.integrationTags.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Integrations</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {tool.integrationTags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      className="bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900 dark:text-blue-100"
-                    >
+                    <Badge key={tag} variant="outline">
                       {tag}
                     </Badge>
                   ))}
                 </div>
-              </Card>
-            )}
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Company Size Fit */}
-            {tool.companySizeFit && tool.companySizeFit.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Best for Company Size</h3>
-                <div className="space-y-2">
-                  {tool.companySizeFit.map((size) => (
-                    <div key={size} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                      <span className="text-sm text-muted-foreground">{size} employees</span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Geography */}
-            {tool.geography && tool.geography.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Available In</h3>
+          {/* Geography */}
+          {tool.geography && tool.geography.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Available In</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {tool.geography.map((geo) => (
                     <Badge key={geo} variant="outline">
@@ -167,65 +219,55 @@ export default async function ToolPage({ params }: ToolPageProps) {
                     </Badge>
                   ))}
                 </div>
-              </Card>
-            )}
+              </CardContent>
+            </Card>
+          )}
+        </aside>
+      </div>
 
-            {/* Use Case Tags */}
-            {tool.tags && tool.tags.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Use Cases</h3>
-                <div className="flex flex-wrap gap-2">
-                  {tool.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      className="text-xs bg-secondary/10 text-secondary-foreground border border-secondary/20"
-                    >
-                      {tag}
+      {/* Related Insights */}
+      {articles.length > 0 && (
+        <>
+          <Separator className="my-12" />
+          <section>
+            <h2 className="mb-6">Related Insights</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {articles.map((article) => (
+                <Card key={article.id} className="overflow-hidden">
+                  <CardHeader>
+                    <Badge variant="outline" className="mb-2 w-fit">
+                      {article.category}
                     </Badge>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
+                    <CardTitle className="line-clamp-2 text-base">
+                      {article.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {article.excerpt}
+                    </p>
+                    <Link
+                      href={`/articles/${article.slug}`}
+                      className="mt-4 inline-flex items-center text-sm font-medium text-primary hover:underline"
+                    >
+                      Read more →
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
-        <Separator className="my-12" />
-
-        {/* Related Articles */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Related Insights</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {articles.slice(0, 3).map((article) => (
-              <Card key={article.id} className="p-6 hover:shadow-lg transition-shadow">
-                <Badge className="bg-secondary/10 text-secondary-foreground border border-secondary/20 mb-3">
-                  {article.category}
-                </Badge>
-                <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                  {article.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {article.excerpt}
-                </p>
-                <Link
-                  href={`/articles/${article.slug}`}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                >
-                  Read more
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <Separator className="my-12" />
-
-        {/* Back Navigation */}
-        <div className="text-center">
-          <Button asChild variant="outline">
-            <Link href="/hr-talent">← Back to HR & Talent Tools</Link>
-          </Button>
-        </div>
+      {/* Back Link */}
+      <div className="mt-12">
+        <Link
+          href="/hr-talent"
+          className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+        >
+          ← Back to HR & Talent Tools
+        </Link>
       </div>
     </Container>
   );

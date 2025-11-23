@@ -1,33 +1,55 @@
 import { Container } from "@/components/layout/container";
-import { Badge } from "@/components/ui/badge";
-import { HrFiltersSidebar } from "@/components/hr/hr-filters-sidebar";
 import { HrToolsGrid } from "@/components/hr/hr-tools-grid";
+import { HrFiltersSidebar } from "@/components/hr/hr-filters-sidebar";
+import { Badge } from "@/components/ui/badge";
+import { getToolsByVertical } from "@/lib/airtable-helpers";
+import { hrTools as mockHrTools } from "@/lib/mock-data";
 
-export default function HrTalentPage() {
+export default async function HrTalentPage() {
+  // Fetch HR tools from Airtable with fallback
+  let tools;
+  try {
+    tools = await getToolsByVertical("HR & Talent");
+
+    if (tools.length === 0) {
+      console.warn("No HR tools found in Airtable, using mock data");
+      tools = mockHrTools;
+    }
+  } catch (error) {
+    console.error("Failed to load HR tools from Airtable:", error);
+    tools = mockHrTools;
+  }
+
   return (
-    <Container>
-      <div className="py-12 md:py-16">
-        <div className="mb-8 space-y-4">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-secondary/10 text-secondary-foreground border border-secondary/20">Vertical: HR & Talent</Badge>
-          </div>
-          <h1 className="text-4xl font-bold">HR & Talent AI Tools</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl">
-            Discover AI-powered solutions for candidate sourcing, screening, interview automation,
-            and more. Filter by your company size, geography, and compliance requirements.
-          </p>
-        </div>
+    <Container className="py-12 md:py-16">
+      {/* Hero Section */}
+      <div className="mb-12">
+        <Badge variant="outline" className="mb-4">
+          Vertical: HR & Talent
+        </Badge>
+        <h1 className="mb-4">HR & Talent AI Tools</h1>
+        <p className="text-lg text-muted-foreground max-w-3xl">
+          Discover AI-powered tools for recruiting, screening, onboarding, performance management,
+          and employee engagement. Curated for HR teams at companies with 50-500 employees.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,280px)_1fr]">
+      {/* Main Content */}
+      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+        {/* Filters Sidebar */}
+        <aside className="lg:sticky lg:top-24 lg:self-start">
           <HrFiltersSidebar />
-          <div>
-            <div className="mb-6">
-              <p className="text-sm text-muted-foreground">
-                Showing all 8 tools
-              </p>
-            </div>
-            <HrToolsGrid />
+        </aside>
+
+        {/* Tools Grid */}
+        <div>
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {tools.length} {tools.length === 1 ? "tool" : "tools"} found
+            </p>
           </div>
+
+          <HrToolsGrid tools={tools} />
         </div>
       </div>
     </Container>

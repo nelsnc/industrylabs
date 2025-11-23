@@ -7,8 +7,9 @@
   --color-foreground: oklch(0.145 0 0);
   --color-primary: oklch(0.62 0.25 270);
   --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.55 0.15 180);
-  --color-secondary-foreground: oklch(0.1 0 0);
+  /* Optimized secondary color - darker teal for better contrast */
+  --color-secondary: oklch(0.45 0.15 180);
+  --color-secondary-foreground: oklch(0.985 0 0);
   --color-accent: oklch(0.75 0.2 85);
   --color-accent-foreground: oklch(0.15 0 0);
   --color-muted: oklch(0.96 0 0);

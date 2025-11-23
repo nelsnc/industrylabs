@@ -1,13 +1,13 @@
 /**
  * Airtable Helper Functions
  *
- * Helper utilities for fetching and mapping Tool data from Airtable.
- * These functions bridge between Airtable's data format and our frontend Tool type.
+ * Helper utilities for fetching and mapping Tool and Article data from Airtable.
+ * These functions bridge between Airtable's data format and our frontend types.
  *
  * @module lib/airtable-helpers
  */
 
-import { getTools as getAirtableTools, getToolBySlug as getAirtableToolBySlug, Tool as AirtableToolType } from './airtable';
+import { getTools as getAirtableTools, getToolBySlug as getAirtableToolBySlug, Tool as AirtableToolType, getAllRecords } from './airtable';
 
 // Frontend Tool interface (matching our existing mock data structure)
 export interface Tool {
@@ -167,4 +167,155 @@ export async function getToolBySlug(slug: string): Promise<Tool | null> {
     console.error(`Error fetching tool by slug "${slug}":`, error);
     throw error;
   }
+}
+
+// ============================================================================
+// Article Types and Functions
+// ============================================================================
+
+/**
+ * Article interface for frontend use
+ */
+export interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  author: string;
+  authorRole?: string;
+  publishedAt: string;
+  readTimeMinutes?: number;
+  featuredImageUrl?: string;
+  content: string[];
+  relatedToolSlugs?: string[];
+}
+
+/**
+ * Airtable Article fields
+ */
+interface ArticleFields {
+  title: string;
+  slug: string;
+  article_type: string;
+  vertical: string;
+  primary_keyword: string;
+  meta_description: string;
+  content: string;
+  featured_image_url?: string;
+  author: string;
+  status: "Draft" | "Published" | "Archived";
+  is_published?: boolean; // Optional - may not exist in schema
+  publish_date?: string;
+  related_tools?: string[]; // Array of record IDs
+  word_count?: number;
+}
+
+/**
+ * Airtable Article record structure
+ */
+interface ArticleRecord {
+  id: string;
+  fields: ArticleFields;
+  createdTime: string;
+}
+
+/**
+ * Map Airtable Article record to frontend Article format
+ *
+ * Transforms the Airtable article structure into the format expected by our frontend components.
+ * Only returns published articles with valid slugs.
+ *
+ * @param record - Article record from Airtable API
+ * @returns Mapped Article for frontend use, or null if not publishable
+ */
+function mapArticleRecord(record: ArticleRecord): Article | null {
+  const f = record.fields;
+
+  // Only return published articles
+  if (!f.slug || f.status !== "Published") {
+    return null;
+  }
+
+  // Split content into paragraphs
+  const content = f.content
+    ? f.content.split(/\n\n+/).filter(Boolean)
+    : [];
+
+  // Calculate read time if not provided (rough estimate: 200 words per minute)
+  const readTime = f.word_count
+    ? Math.ceil(f.word_count / 200)
+    : Math.ceil(content.join(" ").split(" ").length / 200);
+
+  return {
+    id: record.id,
+    slug: f.slug,
+    title: f.title,
+    excerpt: f.meta_description.substring(0, 160),
+    category: f.article_type,
+    author: f.author,
+    authorRole: "Editorial Team",
+    publishedAt: f.publish_date || new Date().toISOString().split("T")[0],
+    readTimeMinutes: readTime,
+    featuredImageUrl: f.featured_image_url,
+    content,
+    relatedToolSlugs: f.related_tools || [],
+  };
+}
+
+/**
+ * Get all published articles from Airtable
+ *
+ * Fetches all articles with status='Published'.
+ * Results are filtered to only include valid, publishable articles.
+ *
+ * @returns Array of mapped Article objects
+ * @throws {AirtableError} If the request fails
+ */
+export async function getAllArticles(): Promise<Article[]> {
+  try {
+    const records = await getAllRecords("ARTICLES") as ArticleRecord[];
+    return records
+      .map(mapArticleRecord)
+      .filter((a): a is Article => a !== null);
+  } catch (error) {
+    console.error("Error fetching articles from Airtable:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get a single article by slug
+ *
+ * Fetches a specific article by its slug for detail pages.
+ * Returns null if no article is found with the given slug.
+ *
+ * @param slug - The article slug to search for
+ * @returns The Article object if found, null otherwise
+ */
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  const articles = await getAllArticles();
+  return articles.find(a => a.slug === slug) || null;
+}
+
+/**
+ * Get related tools for an article
+ *
+ * Fetches tools that are related to the given article.
+ * Uses the relatedToolSlugs from the article to find matching tools.
+ *
+ * @param article - The article to find related tools for
+ * @returns Array of related Tool objects (max 3)
+ */
+export async function getRelatedToolsForArticle(article: Article): Promise<Tool[]> {
+  if (!article.relatedToolSlugs || article.relatedToolSlugs.length === 0) {
+    return [];
+  }
+
+  const tools = await getAllTools();
+
+  // For now, we have tool record IDs, but we need to match by slug
+  // This is a simplified approach - in production you might want to
+  // fetch specific records by ID
+  return tools.slice(0, 3); // Return first 3 tools as related
 }

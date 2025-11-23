@@ -29,7 +29,7 @@ export function ToolCard({ tool }: ToolCardProps) {
 
         <div className="flex flex-wrap gap-2">
           {tool.tags.map((tag) => (
-            <Badge key={tag} className="text-xs bg-secondary/10 text-secondary-foreground border border-secondary/20">
+            <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
           ))}

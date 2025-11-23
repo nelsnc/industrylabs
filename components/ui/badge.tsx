@@ -1,3 +1,17 @@
+/**
+ * Badge Component
+ *
+ * USAGE GUIDELINES:
+ * - Use variant="outline" for category tags and labels (best readability)
+ * - Use variant="secondary" only for non-critical decorative badges
+ * - Use variant="default" for status indicators (primary color)
+ * - Avoid using secondary variant on colored backgrounds
+ *
+ * ACCESSIBILITY:
+ * - Always ensure sufficient color contrast (WCAG AA: 4.5:1 minimum)
+ * - Test readability in both light and dark modes
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
