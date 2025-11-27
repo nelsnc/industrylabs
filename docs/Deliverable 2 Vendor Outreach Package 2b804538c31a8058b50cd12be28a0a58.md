@@ -1,5 +1,6 @@
 # Deliverable 2: Vendor Outreach Package
 
+**Version**: 1.1 - Multi-Model Optimized
 **Date**: 2025-11-27
 **Status**: Ready to Use
 **Purpose**: Complete package for collecting vendor data efficiently
@@ -87,12 +88,25 @@ Questions? Email nelson@industrylabs.ai`
 
 **Section Header**: "Pricing (Buyers' #1 question)"
 
-**Q3.1: What is your typical annual pricing range for mid-market companies (50-500 employees)?**
+**Q3.1a: Minimum typical annual price (for 50-500 employees)**
 
 - Type: Short answer
-- Placeholder: "e.g., £6,000 - £15,000/year"
+- Placeholder: "6000"
 - Required: Yes
-- Helper text: "If truly custom, enter 'Custom - varies by company size and features'"
+- Helper text: "Approximate number only (no currency symbol or commas). We'll format it with £ symbol."
+
+**Q3.1b: Maximum typical annual price**
+
+- Type: Short answer
+- Placeholder: "15000"
+- Required: Yes
+- Helper text: "Approximate number only. If your pricing varies significantly, you can explain in Q3.8 (Pricing Notes)."
+
+**Q3.1c: If pricing is fully custom (optional)**
+
+- Type: Checkbox
+- Option: [ ] Our pricing is fully custom and cannot be estimated with a range
+- Show only if checked: Long answer field for explanation
 
 **Q3.2: Currency**
 
@@ -229,7 +243,7 @@ This helps us match buyers with compatible tools.`
 - Type: Long answer
 - Placeholder: "List any other important integrations: Zoom, Calendly, Loom, etc."
 - Required: No
-- Helper text: "Comma-separated list is fine"
+- Helper text: "Comma-separated list using official product names (e.g., 'Rippling', 'Personio', 'Google Workspace', 'Zoom', 'Calendly'). These will be added to your profile as additional integrations beyond the core systems we asked about above."
 
 ---
 
@@ -441,6 +455,14 @@ Only share information that's already public or that you have permission to shar
 
 **Section Header**: "Final Step"
 
+**Q10.0: Data Accuracy Confirmation**
+
+- Type: Multiple choice (checkboxes)
+- Options:
+    - [ ]  I confirm this data is accurate and represents our current product (not outdated marketing materials)
+    - [ ]  I understand IndustryLabs will display this information publicly and match buyers based on it
+- Required: Yes
+
 **Q10.1: I confirm this information is accurate**
 
 - Type: Multiple choice (checkboxes)
@@ -491,27 +513,24 @@ industrylabs.ai`
 
 **When to use**: First contact with vendor, you've already done AI research
 
-**Subject**: IndustryLabs Premium Partnership - [Tool Name] (AI-researched profile ready)
+**Subject**: [Tool Name] profile on IndustryLabs - please verify accuracy
 
 **Body**:
 
 `Hi [First Name],
 
-I'm building IndustryLabs - a curated B2B AI tool marketplace for HR, L&D, and Customer Support leaders at mid-market companies (50-500 employees).
-
-Unlike generic directories (G2, Capterra), we organize by industry verticals and match buyers to tools via our Request Board - qualified leads with full context (budget, company size, compliance needs, current stack).
-
-I've researched [Tool Name] and created a draft profile using AI and public sources. 
-Before going live, I'd like you to verify accuracy and fill any gaps.
+I've already created [Tool Name]'s profile for IndustryLabs using AI and public sources. Before it goes live, I need you to verify we didn't get anything wrong.
 
 Here's what we found:
 ✓ Built for: [Company sizes from research]
 ✓ Pricing: ~[Price range from research]
-✓ Integrations: [Top 3-5 integrations from research]
+✓ Core integrations: [Top 3-5 integrations from research]
 ✓ Compliance: [GDPR/EEOC/SOC2 from research]
 
-Does this look accurate? Please take 10-15 minutes to verify:
-[Google Form Link]
+**If any of this is inaccurate, it could mean you miss qualified leads** (e.g., we might recommend your enterprise tool to a 50-person company, or vice versa).
+
+Could you take 10 minutes to verify and correct?
+[Google Form Link - Pre-filled with your data]
 
 Early Partner Offer (First 10 Vendors):
 - 3 months free Premium listing
@@ -585,6 +604,50 @@ Nelson
 Nelson Chen
 Founder, IndustryLabs
 industrylabs.ai`
+
+---
+
+### **EMAIL 1C: Post-AI-Research Correction Approach** (HIGHEST RESPONSE RATE)
+
+**When to use**: You've completed AI research with 80%+ confidence, want vendor to verify
+
+**Subject**: Quick verification: [Tool Name] on IndustryLabs
+
+**Body**:
+
+`Hi [First Name],
+
+Quick heads-up: I'm listing [Tool Name] on IndustryLabs, a new curated marketplace for HR tools launching next month.
+
+I've already drafted your profile using public data, but **I don't want to misrepresent your pricing or integrations** since our matching algorithm uses this to send you qualified leads.
+
+Could you take 60 seconds to verify the critical data below?
+
+**We found:**
+- Pricing: [Price range] for mid-market companies
+- Integrations: Native [Integration 1], [Integration 2]; API [Integration 3]
+- Compliance: [GDPR/SOC2/etc.]
+
+**Is this accurate?**
+👉 [Link to Pre-filled Google Form with "Confirm" or "Correct" options]
+
+If I don't hear back in 3 days, I'll go ahead with the data I found (no worries either way - you're listed for free regardless).
+
+Thanks,
+Nelson
+
+---
+Nelson Chen
+Founder, IndustryLabs
+industrylabs.ai`
+
+**Personalization required**:
+
+- [First Name]
+- [Tool Name]
+- [Price range] - e.g., "£8K-£18K/year"
+- [Integration 1, 2, 3] - specific integrations found
+- [GDPR/SOC2/etc.] - compliance certifications found
 
 ---
 
@@ -1117,3 +1180,23 @@ Follow structure from PART 1:
 - 5-10 responses expected
 - 2-4 form submissions expected
 - 1-2 listings go live
+
+---
+
+## CHANGELOG
+
+**Version 1.0** (2025-11-27):
+- Initial vendor outreach package created
+- Google Form structure with 10 sections, ~35 questions
+- 6 email templates (initial outreach, follow-ups, thank you)
+- Vendor FAQ with copy-paste responses
+- Internal tracking system with Airtable views
+- Daily outreach workflow SOP
+
+**Version 1.1** (2025-11-27):
+- Restructured pricing questions (Q3.1a/b/c) for Airtable compatibility - enables direct paste to pricing_annual_min/max fields without manual cleaning
+- Enhanced integrations helper text (Q4.10) for other_integrations field - clearer guidance on official product names and comma-separated format
+- Strengthened EMAIL 1A "pre-filled" psychology - reframed as "prevent errors" not "fill out form", creates urgency around accuracy
+- Added EMAIL 1C "correction approach" template - even shorter, frames as "prevent wrong data" not "sign up", includes soft deadline (HIGHEST RESPONSE RATE)
+- Added data accuracy confirmation checkbox (Q10.0) - creates accountability, reduces disputes later
+- Based on ChatGPT + Gemini + Claude multi-model feedback
