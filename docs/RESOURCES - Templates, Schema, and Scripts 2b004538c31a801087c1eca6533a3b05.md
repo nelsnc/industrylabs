@@ -1,8 +1,8 @@
 # RESOURCES - Templates, Schema, and Scripts
 
-**Version**: 1.2
+**Version**: 1.3
 
-**Last Updated**: November 19, 2025
+**Last Updated**: November 27, 2025
 
 **Purpose**: Central repository for all templates, email scripts, checklists, and reference materials
 
@@ -1071,6 +1071,262 @@ All VA tasks remain valid with Airtable + Next.js. Just mentally map “CMS” t
 
 ---
 
+## 11. VENDOR DATA COLLECTION WORKFLOWS (v2.3)
+
+**Added**: November 27, 2025
+**Purpose**: Systematic collection of vendor data for Schema v2.3 fields (pricing, compliance, implementation, integrations)
+
+### Three-Phase Vendor Data Collection Strategy
+
+**Phase 1: AI Research (ChatGPT + Gemini)**
+- See Deliverable 3 for complete AI research prompts and workflow
+- Populates ~60% of vendor data fields with high confidence
+- Duration: 15-20 minutes per tool
+
+**Phase 2: Vendor Verification (Google Form)**
+- See Deliverable 2 for complete vendor outreach package
+- Vendors verify and enhance AI-researched data
+- Duration: 60 seconds for vendor to complete
+
+**Phase 3: Import to Airtable**
+- Manual import from Google Sheets → Airtable
+- Field-by-field mapping documented below
+
+---
+
+### Airtable Field Mapping Reference
+
+#### GROUP 1: Company Size & Regional Fit
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `ideal_company_size` | Q2.0 (Multiple select) | Copy-paste | Direct match |
+| `company_size_notes` | Q2.1 (Long text) | Copy-paste | Optional clarification |
+| `supported_regions` | Q4.0 (Multiple select) | Copy-paste | Direct match |
+
+---
+
+#### GROUP 2: Pricing Engine
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `pricing_annual_min` | Q3.1a (Number) | Direct paste | GBP, no currency symbol |
+| `pricing_annual_max` | Q3.1b (Number) | Direct paste | GBP, no currency symbol |
+| `pricing_currency` | N/A | Manual: "GBP" | All pricing in GBP |
+| `pricing_model` | Q3.2 (Single select) | Direct match | Per User, Per Hire, Flat Rate, Custom |
+| `pricing_notes` | Q3.8 (Long text) | Copy-paste | Free text details |
+| `pricing_source_url` | N/A | Manual | Link to pricing page |
+| `setup_fee` | Q3.3 (Number) | Direct paste | If "Yes" in Q3.3 |
+| `setup_fee_included` | Q3.3 (Checkbox) | ☑ if "No" | Inverse logic |
+| `free_trial_available` | Q3.4 (Yes/No) | ☑ if "Yes" | Direct |
+| `free_trial_duration_days` | Q3.5 (Number) | Direct paste | If Q3.4 = "Yes" |
+| `contract_length_options` | Q3.7 (Multiple select) | Copy-paste | Monthly, Annual, Multi-Year, Custom |
+
+---
+
+#### GROUP 3: Compliance & Certifications
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `gdpr_compliant` | Q5.1 (Checkbox) | ☑ if checked | Vendor-supplied |
+| `eeoc_compliant` | Q5.1 (Checkbox) | ☑ if checked | Vendor-supplied |
+| `soc2_certified` | Q5.1 (Checkbox) | ☑ if checked | Vendor-supplied |
+| `hipaa_compliant` | Q5.1 (Checkbox) | ☑ if checked | Vendor-supplied |
+| `iso27001_certified` | Q5.1 (Checkbox) | ☑ if checked | Vendor-supplied |
+| `compliance_documentation_url` | Q5.2 (URL) | Copy-paste | Trust center link |
+| `compliance_notes` | Q5.3 (Long text) | Copy-paste | Optional details |
+
+**Critical Disclaimer**: All compliance fields display: "Vendor-supplied information. Not independently verified. Consult your legal team before making compliance decisions."
+
+---
+
+#### GROUP 4: Implementation Timeline
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `implementation_timeline_weeks_min` | Q6.1 (Number) | Direct paste | Minimum weeks |
+| `implementation_timeline_weeks_max` | Q6.2 (Number) | Direct paste | Maximum weeks |
+| `it_hours_required` | Q6.3 (Number) | Direct paste | IT effort hours |
+| `hr_admin_hours_required` | Q6.4 (Number) | Direct paste | HR admin hours |
+| `training_hours_admin` | Q6.5 (Number) | Direct paste | Admin training |
+| `training_hours_enduser` | Q6.6 (Number) | Direct paste | End-user training |
+| `implementation_prerequisites` | Q6.7 (Long text) | Copy-paste | Requirements |
+| `common_implementation_delays` | Q6.8 (Long text) | Copy-paste | Delay factors |
+
+---
+
+#### GROUP 5: Case Study & Social Proof
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `case_study_url` | Q7.1 (URL) | Copy-paste | Public case study |
+| `case_study_company_size` | Q7.2 (Number) | Direct paste | Customer employee count |
+| `case_study_industry` | Q7.3 (Text) | Copy-paste | Industry vertical |
+| `case_study_implementation_weeks` | Q7.4 (Number) | Direct paste | Actual timeline |
+| `case_study_results` | Q7.5 (Long text) | Copy-paste | Outcomes/metrics |
+| `notable_customers` | Q8.1 (Long text) | Copy-paste | Public customers only |
+
+---
+
+#### GROUP 6: Integrations & Rich Media
+
+| Airtable Field | Google Form Question | Import Format | Notes |
+|----------------|---------------------|---------------|-------|
+| `other_integrations` | Q9.2 (Long text) | Copy-paste | Long-tail integrations (comma-separated) |
+| `demo_video_url` | N/A | Manual | Product demo from website |
+| `primary_competitor_ids` | N/A | Manual link | Link to competitor TOOLS records |
+
+**Integration Quality**: Populated via TOOLS_INTEGRATIONS junction table (see below)
+
+---
+
+### Integration Data Import Workflow
+
+**Source**: Google Form Q9.0 (Grid question) - Top 30 integrations × Quality rating
+
+**Destination**: TOOLS_INTEGRATIONS table (junction table)
+
+**Process**:
+1. For each tool submission, review Q9.0 grid responses
+2. For each integration marked "Native", "API", "Zapier", or "Manual":
+   - Create new record in TOOLS_INTEGRATIONS table
+   - `tool_id` = Link to this tool record
+   - `integration_id` = Link to matching INTEGRATIONS record (by name)
+   - `integration_quality` = Grid response value
+   - `verification_source` = "Vendor Documentation"
+   - `last_verified` = Form submission date
+
+3. For integrations marked "Not Supported": Do not create record
+4. For integrations left blank: Do not create record
+
+**Expected Volume**: ~5-10 junction records per tool (most tools integrate with 5-10 core platforms)
+
+---
+
+### REQUESTS Table - Enhanced Buyer Matching Fields
+
+**New fields added to Request Board form** (to be implemented):
+
+| Airtable Field | Form Field | Type | Purpose |
+|----------------|-----------|------|---------|
+| `requester_company_size_exact` | "Exact employee count" | Number | Precise matching vs ranges |
+| `requester_current_stack_names` | "Current tools (select from list)" | Multiple select | Integration compatibility |
+| `requester_current_stack_other` | "Other tools not listed" | Text | Long-tail stack |
+| `requester_budget_min` | "Minimum budget (£/year)" | Number | Price filtering |
+| `requester_budget_max` | "Maximum budget (£/year)" | Number | Price filtering |
+| `requester_region` | "Primary location" | Single select | Regional support matching |
+| `requester_compliance_needs` | "Required compliance" | Multiple select | Compliance filtering |
+
+**Matching Algorithm Enhancement** (Year 1 Manual, Year 2+ AI):
+1. Filter TOOLS by `supported_regions` matching `requester_region`
+2. Filter by `pricing_annual_min` ≤ `requester_budget_max`
+3. Filter by `pricing_annual_max` ≥ `requester_budget_min`
+4. Filter by compliance checkboxes matching `requester_compliance_needs`
+5. Prioritize tools with integrations matching `requester_current_stack_names`
+6. Rank by company size fit overlap
+
+---
+
+### Data Quality Checklist
+
+**Before marking vendor data as "Complete":**
+
+- [ ] All Tier 1 fields populated (pricing, company size, regions, compliance)
+- [ ] At least 3 core integrations verified via TOOLS_INTEGRATIONS junction
+- [ ] Pricing verified against vendor website (link in `pricing_source_url`)
+- [ ] Implementation timeline reasonable for company size (use case study if available)
+- [ ] Compliance disclaimer visible on frontend
+- [ ] `verification_status = "Verified"` if vendor submitted form
+
+**Vendor-Supplied vs AI-Researched**:
+- AI-researched data: `verification_status = "Unverified"`
+- Vendor-supplied via Google Form: `verification_status = "Verified"`
+- Vendor Premium subscriber: `verification_status = "Verified"` (auto-update on subscription)
+
+---
+
+### Manual Import SOP (Google Sheets → Airtable)
+
+**Duration**: ~5 minutes per tool record
+
+1. Open Google Form responses spreadsheet
+2. Open Airtable TOOLS table in side-by-side windows
+3. Locate tool record in Airtable (by tool_name)
+4. For each field group (1-6), copy-paste values from spreadsheet → Airtable
+5. For integrations (Q9.0 grid):
+   - Open TOOLS_INTEGRATIONS table
+   - Create new records for each "Native", "API", "Zapier", "Manual" response
+   - Link `tool_id` and `integration_id` appropriately
+6. Mark tool as `verification_status = "Verified"`
+7. Update `last_updated` field (auto-populated)
+8. Save and verify on frontend that pricing/integrations display correctly
+
+**Bulk Import Option** (Future):
+- Export Google Sheets as CSV
+- Use Airtable CSV import with field mapping
+- Manually review for errors
+- Faster for 10+ tools at once
+
+---
+
+### Vendor Outreach Sequencing for Data Collection
+
+**Recommended Email Flow**:
+
+**Email 1A/1B**: Initial outreach (Premium listing offer)
+- Focus: Value proposition, Request Board, Premium features
+- Do NOT ask for data yet
+
+**Email 1G**: Post-demo follow-up (if interested)
+- "To get you set up, I need logo, description, screenshots"
+- Mention: "I'll also send a quick form to verify pricing and integrations (60 seconds)"
+
+**Email - NEW: Verification Form** (send after Premium signup):
+```
+Subject: Quick verification - [Tool Name] data
+
+Hi [First Name],
+
+Welcome to IndustryLabs Premium! To finalize your enhanced listing, please verify your tool data (pricing, integrations, compliance) via this 60-second form:
+
+[Google Form Link]
+
+This ensures buyers see accurate information and improves match quality for Request Board leads.
+
+Already populated based on our research - just review and correct anything that's off.
+
+Thanks!
+Nelson
+```
+
+**Timing**: Send form 24-48 hours after Premium signup (gives them time to see value first)
+
+---
+
+### AI Research → Vendor Verification Workflow
+
+**Step 1: AI Research (Initial 20 Tools)**
+- Use ChatGPT + Gemini prompts from Deliverable 3
+- Populate all 39 new fields with "best effort" data
+- Mark as `verification_status = "Unverified"`
+- Document sources in `pricing_source_url`, `compliance_documentation_url`
+
+**Step 2: Vendor Outreach (Free Tier Notification)**
+- Send Template 4B (Free Tier Vendor Notification)
+- Include link to Google Form for verification: "If any of this is wrong, correct it here"
+
+**Step 3: Vendor Correction (Optional)**
+- Vendor submits form → updates data → `verification_status = "Verified"`
+- OR vendor ignores → data stays "Unverified" (still usable, just labeled as such)
+
+**Step 4: Premium Conversion**
+- Vendor converts → receives verification form as part of onboarding
+- Upon completion → `verification_status = "Verified"`
+
+**Philosophy**: Start with AI research (fast, scalable), improve with vendor input (accurate, trustworthy), never block on vendor response (always have usable data).
+
+---
+
 ## CHANGELOG
 
 **Version 1.0** (Nov 16, 2025):
@@ -1095,9 +1351,20 @@ All VA tasks remain valid with Airtable + Next.js. Just mentally map “CMS” t
 **Version 1.2** (Nov 19, 2025):
 
 - Aligned content workflows with **Next.js + Airtable** architecture
-- Updated Pre-Publishing checklist to reference `/articles/[slug]` rendering instead of generic “CMS”
+- Updated Pre-Publishing checklist to reference `/articles/[slug]` rendering instead of generic "CMS"
 - Clarified Airtable usage as the single source of truth for ARTICLES consumed by the Next.js frontend
 - Confirmed all templates remain stack-agnostic where possible (email, outreach, VA tasks unchanged)
+
+**Version 1.3** (Nov 27, 2025):
+
+- Added comprehensive **Vendor Data Collection Workflows** section (Section 11)
+- Documented three-phase data collection strategy (AI Research → Vendor Verification → Airtable Import)
+- Complete Airtable field mapping reference for all 39 new Schema v2.3 fields
+- Integration data import workflow via TOOLS_INTEGRATIONS junction table
+- Enhanced buyer matching fields for REQUESTS table
+- Data quality checklists and manual import SOPs
+- Vendor outreach sequencing for data collection
+- AI Research → Vendor Verification workflow documentation
 
 ---
 

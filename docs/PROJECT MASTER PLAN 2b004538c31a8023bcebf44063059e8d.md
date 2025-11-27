@@ -71,11 +71,18 @@ Unlike generic AI tool directories (Futurepedia, There's An AI For That) that or
 
 **Data & Backend Layer**
 
-- **Primary Data Store**: Airtable (existing multi-table schema for TOOLS, VENDORS, CATEGORIES, ARTICLES, REQUESTS, etc.)
+- **Primary Data Store**: Airtable Schema v2.3 (12 tables, ~250 fields, 14 relationships)
+    - Core tables: TOOLS, VENDORS, REQUESTS
+    - Supporting: CATEGORIES, COMPLIANCE_TAGS, INTEGRATIONS (30 records)
+    - Junction: TOOLS_INTEGRATIONS (integration quality tracking)
+    - Content: ARTICLES, USE_CASES, NOTIFY_LIST
+    - Recommendations: RECOMMENDATIONS (AI-generated buyer matches)
+    - **New in v2.3**: Vendor data architecture complete (pricing engine, compliance verification, implementation timelines, integration quality tracking, personalized recommendations)
 - **Data Access**: Server-side fetching in Next.js (no Airtable API key exposed to the client)
 - **Backend Logic**: Next.js API Routes for:
     - Request Board submissions → create records in `REQUESTS`
     - Notification hooks (email, optional webhooks later)
+    - Future: AI-powered recommendation engine using RECOMMENDATIONS table
 - **Hosting**: Vercel (build, deploy, environment variables, preview environments)
 - **SEO & Routing**:
     - File-based routing for `/`, `/hr-talent`, `/hr-talent/[slug]`, `/tools/[slug]`, `/articles/[slug]`, `/request-board`
@@ -158,10 +165,14 @@ IndustryLabs is developed using multiple AI assistants in combination:
 
 - Enhanced profile page: Full description (500+ words), screenshots (up to 5), demo video
 - Comprehensive features list with tooltips
-- Integration directory (which tools it connects with)
-- Compliance badges (with disclaimer: vendor-supplied information)
+- **Integration quality tracking** (v2.3): Shows Native/API/Zapier/Manual integration quality for top 30 platforms
+- **Detailed pricing transparency** (v2.3): Annual min/max, contract options, free trial info, setup fees
+- **Compliance verification** (v2.3): GDPR, EEOC, SOC2, HIPAA, ISO27001 badges (vendor-supplied with disclaimer)
+- **Implementation timeline estimator** (v2.3): Weeks-to-deploy, IT/HR hours required, prerequisites
+- **Case study showcase** (v2.3): Customer success stories with company size, industry, results
 - Priority placement in category pages (top 3 positions rotate among Premium)
 - Request Board lead notifications (email + SMS within 2 hours of matching request)
+- **Enhanced buyer matching** (v2.3): Matched on budget, region, current stack, compliance needs
 - Basic analytics dashboard (page views, clicks, requests matched)
 
 **Subscription Counting**:
@@ -500,9 +511,12 @@ If update volume increases but full portal threshold not met:
 - Multiple screenshots (up to 5)
 - Demo video embedding
 - Comprehensive features list
-- Integration directory
+- **Integration quality tracking (v2.3)**: Native/API/Zapier/Manual quality for 30 platforms
+- **Detailed pricing (v2.3)**: Annual ranges, contracts, trials, setup fees
+- **Compliance badges (v2.3)**: GDPR, EEOC, SOC2, HIPAA, ISO27001 (vendor-supplied)
+- **Implementation timelines (v2.3)**: Weeks-to-deploy, effort hours, prerequisites
 - Priority placement in categories
-- Request Board lead notifications
+- Request Board lead notifications with **enhanced matching (v2.3)**: budget, region, stack, compliance
 - Basic analytics (page view counts)
 
 **Early Adopter Incentive**: First 10 vendors receive 3-month free trial
