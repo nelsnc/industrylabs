@@ -1,5 +1,6 @@
 # Deliverable 3: AI Research Prompts & Workflow
 
+**Version**: 1.1 - Multi-Model Enhanced
 **Date**: 2025-11-27
 **Status**: Ready to Use
 **Purpose**: ChatGPT + Gemini research workflow for populating initial 20 tools
@@ -77,6 +78,13 @@ CRITICAL RESEARCH RULES:
 4. FLAG UNCERTAINTY - if you're not confident (60%+ confidence), say so
 5. NO HALLUCINATION - if info doesn't exist, say "Not found" not make it up
 6. Focus on MID-MARKET (50-500 employees) - if tool only serves enterprise (500+) or SMB (1-50), flag this
+7. CHECK SOURCE FRESHNESS - For time-sensitive data:
+   • Pricing pages: Look for "Last Updated" date, check if mentions 2024/2025
+   • SOC 2 certificates: Check issue date (expires after 12 months)
+   • Integration pages: Look for recent product announcements
+   • If source appears outdated (2023 or earlier for pricing/compliance), flag as:
+     "Source potentially outdated - vendor confirmation recommended"
+   • Include source date in citation where visible
 
 ---
 
@@ -126,6 +134,15 @@ Output Format:
   "free_trial_available": true,
   "free_trial_duration_days": 14,
   "contract_length_options": ["Monthly", "Annual"],
+  "currency_conversion_details": {
+    "original_currency": "USD", // "USD" / "EUR" / null if already GBP
+    "original_price_min": 8000,
+    "original_price_max": 20000,
+    "exchange_rate_used": "1 USD = 0.79 GBP",
+    "conversion_date": "2025-11-27",
+    "converted_price_min": 6320,
+    "converted_price_max": 15800
+  }, // null if no conversion needed
   "confidence": "High/Medium/Low",
   "sources": [
     "https://vendor.com/pricing - public pricing page"
@@ -133,6 +150,12 @@ Output Format:
   "evidence": "Pricing page clearly shows £6,000-£15,000/year for 50-500 employees. Setup fee: £1,500. Free 14-day trial mentioned.",
   "flags": "None" // or "No pricing - says 'Contact Sales'" or "Pricing only in USD, converted to GBP"
 }
+
+If currency conversion performed:
+- State original currency and values
+- State exchange rate used (approximate current rate)
+- Include both original and converted values
+- This provides audit trail when vendors dispute pricing
 
 ---
 
@@ -149,6 +172,26 @@ ATS: Greenhouse, Lever, Ashby, SmartRecruiters, Workable, JazzHR, Breezy HR, Rec
 Payroll: ADP, Paychex, Justworks, Zenefits
 Communication: Slack, Microsoft Teams, Google Chat, Zoom, Google Meet
 Calendar: Google Calendar, Outlook Calendar, Office 365, Apple Calendar
+
+INTEGRATION QUALITY VERIFICATION (Tiered Approach):
+
+**For TOP 5 CRITICAL INTEGRATIONS** (Workday, BambooHR, Greenhouse, Slack, Microsoft Teams):
+1. Check vendor's integrations page
+2. Check partner directory (e.g., Workday Marketplace, Slack App Directory)
+3. Check API documentation for integration references
+4. Check Zapier for connector existence
+5. If still unclear after all 4 checks: "Unclear - vendor confirmation needed"
+
+**For OTHER INTEGRATIONS** (remaining 25 from list):
+1. Check vendor's integrations page
+2. Check Zapier if not found
+3. If unclear: "Unclear - vendor confirmation needed"
+
+OUTPUT REQUIREMENT FOR ALL 30:
+You MUST output all 30 core integrations with quality value:
+"Native", "API", "Zapier", "Manual", "Not Supported", or "Unclear - vendor confirmation needed"
+
+Do not omit integrations just because you didn't find information.
 
 Output Format:
 {
@@ -217,6 +260,21 @@ Questions:
 a) Which countries/regions does the vendor explicitly support?
 b) Check "About Us", "Customers", pricing page (currency options), support page
 c) Look for regional data centers or compliance (e.g., EU data residency for GDPR)
+
+REGION DETECTION METHODS (in priority order):
+
+1. **Explicit statements**: "We serve UK, US, EU customers"
+2. **Data center locations**: "EU data center in Dublin"
+3. **Customer examples**: Customer logos from specific countries
+4. **Currency pricing options**:
+   • GBP pricing → UK support very likely
+   • EUR pricing → EU support very likely
+   • AUD pricing → Australia support
+   • USD-only → often US-only or US-first
+
+If inferring from currency:
+- Mark confidence as "Medium - inferred from pricing currency"
+- Add note: "Inferred from [GBP/EUR/etc.] pricing availability"
 
 Output Format:
 {
@@ -319,11 +377,24 @@ After completing all 8 categories, provide:
     "Pricing not public - marked as 'Contact Sales'",
     "Integration quality unclear for most systems"
   ],
+  "vendor_must_confirm": [
+    "Pricing (source from 2023, may be outdated)",
+    "Workday integration quality (vendor page vague on Native vs API)",
+    "SOC 2 certificate (couldn't find current report, only press release)"
+  ],
   "vendor_outreach_priority": "High/Medium/Low", // Should we prioritize asking vendor to verify?
   "ready_for_listing": true/false, // Can we list with current data or too many gaps?
   "research_time_minutes": 35, // How long did this take you?
   "notes": "Excellent documentation. All Tier 1 data found with high confidence. Recommend listing immediately and asking vendor to verify pricing."
 }
+
+After completing research, explicitly list any data points that are:
+- Low confidence (<70%)
+- From outdated sources (2023 or earlier for pricing/compliance)
+- Conflicting across sources
+- Inferred rather than confirmed
+
+This list will be used in EMAIL 1A to ask vendor to verify specific items.
 
 ---
 
@@ -425,8 +496,11 @@ Pay extra attention to these high-impact fields:
 
 2. **Integrations** (buyers' #2 question):
    - Did ChatGPT correctly identify "Native" vs "Zapier"?
-   - Check vendor's official integrations page vs ChatGPT's interpretation
+   - For TOP 5 integrations (Workday, BambooHR, Greenhouse, Slack, MS Teams):
+     • Verify in partner directory if possible
+     • Check if ChatGPT cited integration documentation vs just listing page
    - Look for integration quality clues ChatGPT may have missed
+   - Common false positives: "Listed on integrations page" ≠ "Native integration"
 
 3. **Compliance** (critical for enterprise buyers):
    - Are certificates current? (SOC 2 reports expire after 1 year)
@@ -591,43 +665,46 @@ json
     "email_template_to_use": "EMAIL 1A",
     "notes": "High-quality research overall. Will send EMAIL 1A with pre-filled pricing, company size, integrations. Vendor should verify pricing and Workday integration quality."
   },
-  
+
   "airtable_ready_data": {
-    "ideal_company_size": ["51-200", "201-500"],
-    "company_size_notes": "...",
-    "supported_regions": ["UK", "US", "EU", "Global"],
-    "pricing_annual_min": 6000,
-    "pricing_annual_max": 15000,
-    "pricing_currency": "GBP",
-    "pricing_model": "Flat Rate",
-    "pricing_notes": "...",
-    "pricing_source_url": "https://greenhouse.com/pricing",
-    "gdpr_compliant": true,
-    "eeoc_compliant": true,
-    "soc2_certified": true,
-    "iso27001_certified": false,
-    "hipaa_compliant": null,
-    "compliance_documentation_url": "https://greenhouse.com/security",
-    "implementation_timeline_weeks_min": 2,
-    "implementation_timeline_weeks_max": 4,
-    "other_integrations": "Zoom, Calendly, Loom",
-    "demo_video_url": "https://youtube.com/watch?v=abc123",
-    "case_study_url": "https://greenhouse.com/customers/acme",
-    "case_study_company_size": 200,
-    "integrations_to_create": [
+    "TOOLS_table_fields": {
+      "ideal_company_size": ["51-200", "201-500"],
+      "company_size_notes": "...",
+      "supported_regions": ["UK", "US", "EU", "Global"],
+      "pricing_annual_min": 6000,
+      "pricing_annual_max": 15000,
+      "pricing_currency": "GBP",
+      "pricing_model": "Flat Rate",
+      "pricing_notes": "...",
+      "pricing_source_url": "https://greenhouse.com/pricing",
+      "gdpr_compliant": true,
+      "eeoc_compliant": true,
+      "soc2_certified": true,
+      "iso27001_certified": false,
+      "hipaa_compliant": null,
+      "compliance_documentation_url": "https://greenhouse.com/security",
+      "implementation_timeline_weeks_min": 2,
+      "implementation_timeline_weeks_max": 4,
+      "other_integrations": "Zoom, Calendly, Loom, Notion",
+      "demo_video_url": "https://youtube.com/watch?v=abc123",
+      "case_study_url": "https://greenhouse.com/customers/acme",
+      "case_study_company_size": 200
+      // ... all other TOOLS fields ready to paste
+    },
+    "TOOLS_INTEGRATIONS_records": [
       {
         "integration_name": "Workday",
         "integration_quality": "Native",
-        "integration_notes": "Real-time sync",
-        "verification_source": "Vendor"
+        "integration_notes": "Real-time sync via native Workday integration",
+        "verification_source": "Vendor Documentation"
       },
       {
         "integration_name": "Slack",
         "integration_quality": "Native",
-        "integration_notes": "Notifications via Slack app",
-        "verification_source": "Documentation"
+        "integration_notes": "Notifications and reminders via Slack app",
+        "verification_source": "Slack App Directory"
       }
-      *// ... all 30 core integrations*
+      // ... all 30 core integrations
     ]
   }
 }`
@@ -656,6 +733,15 @@ json
 - [ ]  Confirm top 5 integrations ChatGPT listed are accurate
 - [ ]  Check if integration page says "Native" or "Via Zapier" explicitly
 - [ ]  If vague, flag for vendor confirmation
+
+**2.5 Core Integration Verification (TOP 5 ONLY)** (3 mins)
+
+- [ ]  For Workday, BambooHR, Greenhouse, Slack, Microsoft Teams:
+  - Visit vendor's integration page directly
+  - Look for "Native", "Built-in", "Official Partner" language
+  - If page just lists integration name without quality: mark as "Unclear"
+- [ ]  If ChatGPT marked as "Native" but evidence is weak, change to "API" or "Unclear"
+- [ ]  This prevents false "Native Workday" claims that damage trust
 
 **3. Compliance (GDPR, SOC 2)** (2 mins)
 
@@ -902,3 +988,28 @@ json
     "notes": "Very low confidence. Website is minimal. Need 1-hour deep manual research OR skip this tool for now."
   }
 }`
+
+---
+
+## CHANGELOG
+
+**Version 1.0** (2025-11-27):
+- Initial AI research workflow created
+- ChatGPT research prompt with 8 categories (Tier 1, 2, 3 data)
+- Gemini verification prompt for cross-checking
+- Consolidated output template combining ChatGPT + Gemini + manual review
+- Nelson manual review checklist (10-15 mins per tool)
+- Workflow execution plan for 20 tools across 2 weeks
+- AI research tips & tricks
+- Output examples (high/medium/low confidence)
+
+**Version 1.1** (2025-11-27):
+- Added source freshness checking (Rule #7) for pricing and compliance - prevents listing outdated data (2023 or earlier)
+- Enhanced integration verification with triangulation logic (tiered by priority) - TOP 5 integrations get 4-step verification, others get 2-step
+- Added currency conversion tracking for audit trail - provides transparency when vendors dispute converted pricing
+- Added region inference from currency pricing - enables reasonable geographic assumptions from pricing currency availability
+- Added explicit vendor_must_confirm list in overall assessment - creates clear handoff to EMAIL 1A with specific verification items
+- Added Gemini integration verification enhancements - flags common false positives ("listed on page" ≠ "native integration")
+- Added airtable_ready_data section for direct import - eliminates manual field mapping, enables copy-paste to Airtable
+- Added integration verification step (2.5) to Nelson manual review - prevents false "Native Workday" claims that damage trust
+- Based on ChatGPT + Gemini + Claude multi-model feedback
