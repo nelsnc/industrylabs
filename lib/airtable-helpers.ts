@@ -319,3 +319,276 @@ export async function getRelatedToolsForArticle(article: Article): Promise<Tool[
   // fetch specific records by ID
   return tools.slice(0, 3); // Return first 3 tools as related
 }
+
+// ============================================================================
+// Tool Integration Types and Functions
+// ============================================================================
+
+import {
+  ToolIntegration,
+  ToolsIntegrationsFields,
+  IntegrationQuality,
+  VerificationSource,
+  CreateToolIntegrationInput,
+  IntegrationQueryOptions,
+} from './types/integration';
+import { createRecord } from './airtable';
+
+/**
+ * Airtable Integration fields
+ */
+interface IntegrationFields {
+  integration_name: string;
+  integration_category?: string;
+  tools_count?: number;
+}
+
+/**
+ * Airtable Tool fields (for integration lookup)
+ */
+interface ToolFieldsForIntegration {
+  tool_name: string;
+  tool_slug: string;
+}
+
+/**
+ * Get all integrations for a specific tool
+ *
+ * Fetches junction records where tool_id matches the provided toolId
+ * and resolves the linked integration details.
+ *
+ * @param toolId - The Airtable record ID of the tool
+ * @param options - Optional query filters
+ * @returns Array of ToolIntegration objects
+ * @throws {AirtableError} If the request fails
+ */
+export async function getIntegrationsForTool(
+  toolId: string,
+  options?: IntegrationQueryOptions
+): Promise<ToolIntegration[]> {
+  try {
+    // Fetch all junction records
+    const junctionRecords = await getAllRecords('TOOLS_INTEGRATIONS') as Array<{
+      id: string;
+      fields: ToolsIntegrationsFields;
+    }>;
+
+    // Filter by toolId
+    let filtered = junctionRecords.filter(
+      record => record.fields.tool_id?.includes(toolId)
+    );
+
+    // Apply optional filters
+    if (options?.quality) {
+      filtered = filtered.filter(r => r.fields.integration_quality === options.quality);
+    }
+    if (options?.verificationSource) {
+      filtered = filtered.filter(r => r.fields.verification_source === options.verificationSource);
+    }
+    if (options?.verifiedAfter) {
+      filtered = filtered.filter(r =>
+        r.fields.last_verified && r.fields.last_verified >= options.verifiedAfter!
+      );
+    }
+    if (options?.limit) {
+      filtered = filtered.slice(0, options.limit);
+    }
+
+    // Fetch tool and integration details for resolution
+    const tools = await getAllRecords('TOOLS') as Array<{
+      id: string;
+      fields: ToolFieldsForIntegration;
+    }>;
+    const integrations = await getAllRecords('INTEGRATIONS') as Array<{
+      id: string;
+      fields: IntegrationFields;
+    }>;
+
+    // Map to ToolIntegration objects
+    return filtered.map(record => {
+      const tool = tools.find(t => record.fields.tool_id?.includes(t.id));
+      const integration = integrations.find(i => record.fields.integration_id?.includes(i.id));
+
+      return {
+        junctionId: record.fields.junction_id || 0,
+        toolId: record.fields.tool_id?.[0] || '',
+        toolName: tool?.fields.tool_name || 'Unknown',
+        integrationId: record.fields.integration_id?.[0] || '',
+        integrationName: integration?.fields.integration_name || 'Unknown',
+        quality: record.fields.integration_quality || 'Not Supported',
+        notes: record.fields.integration_notes,
+        lastVerified: record.fields.last_verified,
+        verificationSource: record.fields.verification_source || 'AI Research',
+      };
+    });
+  } catch (error) {
+    console.error(`Error fetching integrations for tool "${toolId}":`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get all tools using a specific integration
+ *
+ * Fetches junction records where integration_id matches the provided integrationId
+ * and resolves the linked tool details.
+ *
+ * @param integrationId - The Airtable record ID of the integration
+ * @param options - Optional query filters
+ * @returns Array of ToolIntegration objects
+ * @throws {AirtableError} If the request fails
+ */
+export async function getToolsUsingIntegration(
+  integrationId: string,
+  options?: IntegrationQueryOptions
+): Promise<ToolIntegration[]> {
+  try {
+    // Fetch all junction records
+    const junctionRecords = await getAllRecords('TOOLS_INTEGRATIONS') as Array<{
+      id: string;
+      fields: ToolsIntegrationsFields;
+    }>;
+
+    // Filter by integrationId
+    let filtered = junctionRecords.filter(
+      record => record.fields.integration_id?.includes(integrationId)
+    );
+
+    // Apply optional filters
+    if (options?.quality) {
+      filtered = filtered.filter(r => r.fields.integration_quality === options.quality);
+    }
+    if (options?.verificationSource) {
+      filtered = filtered.filter(r => r.fields.verification_source === options.verificationSource);
+    }
+    if (options?.verifiedAfter) {
+      filtered = filtered.filter(r =>
+        r.fields.last_verified && r.fields.last_verified >= options.verifiedAfter!
+      );
+    }
+    if (options?.limit) {
+      filtered = filtered.slice(0, options.limit);
+    }
+
+    // Fetch tool and integration details for resolution
+    const tools = await getAllRecords('TOOLS') as Array<{
+      id: string;
+      fields: ToolFieldsForIntegration;
+    }>;
+    const integrations = await getAllRecords('INTEGRATIONS') as Array<{
+      id: string;
+      fields: IntegrationFields;
+    }>;
+
+    // Map to ToolIntegration objects
+    return filtered.map(record => {
+      const tool = tools.find(t => record.fields.tool_id?.includes(t.id));
+      const integration = integrations.find(i => record.fields.integration_id?.includes(i.id));
+
+      return {
+        junctionId: record.fields.junction_id || 0,
+        toolId: record.fields.tool_id?.[0] || '',
+        toolName: tool?.fields.tool_name || 'Unknown',
+        integrationId: record.fields.integration_id?.[0] || '',
+        integrationName: integration?.fields.integration_name || 'Unknown',
+        quality: record.fields.integration_quality || 'Not Supported',
+        notes: record.fields.integration_notes,
+        lastVerified: record.fields.last_verified,
+        verificationSource: record.fields.verification_source || 'AI Research',
+      };
+    });
+  } catch (error) {
+    console.error(`Error fetching tools for integration "${integrationId}":`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get integration quality for a specific tool-integration pair
+ *
+ * Finds the junction record matching both IDs and returns the integration quality.
+ *
+ * @param toolId - The Airtable record ID of the tool
+ * @param integrationId - The Airtable record ID of the integration
+ * @returns The integration quality, or null if no relationship exists
+ * @throws {AirtableError} If the request fails
+ */
+export async function getIntegrationQuality(
+  toolId: string,
+  integrationId: string
+): Promise<IntegrationQuality | null> {
+  try {
+    // Fetch all junction records
+    const junctionRecords = await getAllRecords('TOOLS_INTEGRATIONS') as Array<{
+      id: string;
+      fields: ToolsIntegrationsFields;
+    }>;
+
+    // Find matching junction record
+    const match = junctionRecords.find(
+      record =>
+        record.fields.tool_id?.includes(toolId) &&
+        record.fields.integration_id?.includes(integrationId)
+    );
+
+    return match?.fields.integration_quality || null;
+  } catch (error) {
+    console.error(`Error fetching integration quality for tool "${toolId}" and integration "${integrationId}":`, error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new tool-integration relationship
+ *
+ * Creates a junction record linking a tool to an integration with specified quality level.
+ *
+ * @param data - The integration relationship data
+ * @returns The ID of the created junction record
+ * @throws {Error} If validation fails
+ * @throws {AirtableError} If the Airtable request fails
+ */
+export async function createToolIntegration(data: CreateToolIntegrationInput): Promise<string> {
+  try {
+    // Validate input
+    if (!data.toolId) {
+      throw new Error('toolId is required');
+    }
+    if (!data.integrationId) {
+      throw new Error('integrationId is required');
+    }
+    if (!data.quality) {
+      throw new Error('quality is required');
+    }
+    if (!data.verificationSource) {
+      throw new Error('verificationSource is required');
+    }
+
+    // Check if junction record already exists
+    const existing = await getIntegrationQuality(data.toolId, data.integrationId);
+    if (existing) {
+      throw new Error(`Integration relationship already exists between tool "${data.toolId}" and integration "${data.integrationId}"`);
+    }
+
+    // Prepare fields
+    const fields: Record<string, unknown> = {
+      tool_id: [data.toolId],
+      integration_id: [data.integrationId],
+      integration_quality: data.quality,
+      verification_source: data.verificationSource,
+      last_verified: data.lastVerified || new Date().toISOString().split('T')[0],
+    };
+
+    if (data.notes) {
+      fields.integration_notes = data.notes;
+    }
+
+    // Create the junction record
+    const record = await createRecord('TOOLS_INTEGRATIONS', fields);
+
+    return record.id;
+  } catch (error) {
+    console.error('Error creating tool integration:', error);
+    throw error;
+  }
+}
