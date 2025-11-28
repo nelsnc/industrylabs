@@ -16,7 +16,8 @@ config({ path: resolve(__dirname, '../.env.local') });
 interface IntegrationFields {
   integration_id?: number;
   integration_name: string;
-  integration_category: string[];
+  // Airtable may return this as either a Single Select string or Multiple Select array
+  integration_category?: string | string[];
   integration_type: 'Core' | 'Complementary';
   website_url: string;
   is_common: boolean;
