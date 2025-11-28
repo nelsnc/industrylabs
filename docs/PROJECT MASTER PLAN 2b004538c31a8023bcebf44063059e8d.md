@@ -53,6 +53,39 @@ Unlike generic AI tool directories (Futurepedia, There's An AI For That) that or
 - Vendors receive qualified leads with full context (not anonymous clicks)
 - Creates network effects: More buyers → More vendor value → More vendors → Better matching
 
+**Vendor Data Collection Workflow** (New - v2.3)
+
+**Three-phase approach**:
+
+1. **AI Research** (30-45 mins per tool):
+   - ChatGPT researches pricing, integrations, compliance, implementation timeline
+   - Gemini cross-checks and assigns confidence scores
+   - Manual review of critical fields (pricing, top 5 integrations, compliance)
+   - Output: Structured JSON with 80-90% confidence on Tier 1 data
+
+2. **Vendor Verification** (Google Form):
+   - Pre-filled form with AI research data
+   - Vendors correct errors rather than fill blank form (psychology: 2-3x higher response rate)
+   - 10-15 minute time commitment
+   - Focus on Tier 1 fields (company size, pricing, integrations, compliance, regions)
+
+3. **Import & Verification**:
+   - Import form responses to Airtable
+   - Create TOOLS_INTEGRATIONS records for each integration
+   - Update verification_status = "Verified"
+   - Tool ready for Premium listing
+
+**Data Quality Standards**:
+- Tier 1 (Must Have): 100% complete before listing
+- Tier 2 (Should Have): 70%+ complete for Premium listings
+- Tier 3 (Nice to Have): Best effort, not required
+
+**Maintenance**:
+- Vendors can update via form (no self-serve portal in Year 1)
+- Pricing reviewed quarterly (flag if source is >6 months old)
+- SOC 2 certificates checked annually (expire after 12 months)
+- Integration quality spot-checked when vendors report issues
+
 **AI-Assisted Content Engine**
 
 - Tool comparisons ("Greenhouse vs Lever"), "Best AI for X" guides, buyer playbooks

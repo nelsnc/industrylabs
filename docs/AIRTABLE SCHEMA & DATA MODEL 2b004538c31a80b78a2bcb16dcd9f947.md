@@ -258,6 +258,48 @@ This document defines the complete data architecture for IndustryLabs. It serves
 | **implementation_prerequisites** | Long text | No | Requirements |
 | **common_implementation_delays** | Long text | No | Delay factors |
 
+**implementation_timeline_display formula**:
+```
+IF(
+  AND({implementation_timeline_weeks_min}, {implementation_timeline_weeks_max}),
+  CONCATENATE({implementation_timeline_weeks_min}, "-", {implementation_timeline_weeks_max}, " weeks typical"),
+  "Contact vendor for timeline"
+)
+```
+
+**Personalization Logic (Next.js)**:
+```javascript
+const SIZE_BUCKETS = {
+  "1-50": {min: 1, max: 50},
+  "51-200": {min: 51, max: 200},
+  "201-500": {min: 201, max: 500},
+  "500+": {min: 501, max: 5000}
+};
+
+function estimateTimelineForBuyer(tool, buyerCompanySize) {
+  const minWeeks = tool.implementation_timeline_weeks_min;
+  const maxWeeks = tool.implementation_timeline_weeks_max;
+  if (!minWeeks || !maxWeeks) return null;
+
+  const idealBuckets = tool.ideal_company_size || [];
+  const isInIdealRange = idealBuckets.some(bucket => {
+    const range = SIZE_BUCKETS[bucket];
+    return range && buyerCompanySize >= range.min && buyerCompanySize <= range.max;
+  });
+
+  if (isInIdealRange) return Math.round((minWeeks + maxWeeks) / 2);
+
+  const maxIdealSize = Math.max(...idealBuckets.map(bucket => SIZE_BUCKETS[bucket]?.max || 0));
+  if (buyerCompanySize > maxIdealSize) return maxWeeks + 1;
+  return minWeeks;
+}
+
+// Example:
+// Tool: min=2, max=4, ideal_company_size=["51-200", "201-500"]
+// Buyer: 200 employees → estimate: 3 weeks (average, in ideal range)
+// Buyer: 600 employees → estimate: 5 weeks (max + 1, above ideal range)
+```
+
 ---
 
 ### GROUP 5: Case Study & Social Proof (6 fields)
@@ -422,6 +464,27 @@ Manual algorithm:
 6. Update `matched_tools` and `notified_vendors`
 7. Set `status = "Matched"` and populate `response_date`
 8. Follow up for `outcome` after ~7 days
+
+**Phase 2 (Month 13+)**: AI-assisted matching
+
+Next.js generates fit scores and reasoning:
+```javascript
+const fitScore = calculateFitScore({
+  companySize: 30,     // Weight: within ideal range vs outside
+  budget: 25,          // Weight: within range vs too expensive
+  integrations: 20,    // Weight: native integrations with current stack
+  compliance: 15,      // Weight: all required compliance met
+  region: 10           // Weight: same region vs global
+});
+
+const reasoning = generateReasoning({
+  strengths: ["Native Workday integration", "Pricing fits budget"],
+  weaknesses: ["No HIPAA compliance (not required)"],
+  timeline: "Est. 3 weeks for 200-employee company"
+});
+```
+
+Write to RECOMMENDATIONS table, link to REQUEST.
 
 ---
 
