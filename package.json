@@ -33,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.0.14",
     "@vitest/ui": "^4.0.14",
     "dotenv": "^17.2.3",
     "eslint": "^9",
