@@ -30,6 +30,57 @@ export interface Tool {
   integrationTags?: string[];
   websiteUrl?: string;
   detailedPricing?: string;
+
+  // GROUP 1: Company Size & Regional Fit (v2.3)
+  idealCompanySize?: string[];
+  companySizeNotes?: string;
+  supportedRegions?: string[];
+
+  // GROUP 2: Pricing Engine (v2.3)
+  pricingAnnualMin?: number;
+  pricingAnnualMax?: number;
+  pricingCurrency?: 'GBP' | 'USD' | 'EUR';
+  pricingNotes?: string;
+  pricingDisplay?: string;
+  pricingSourceUrl?: string;
+  setupFee?: number;
+  setupFeeIncluded?: boolean;
+  freeTrialAvailable?: boolean;
+  freeTrialDurationDays?: number;
+  contractLengthOptions?: string[];
+
+  // GROUP 3: Compliance & Certifications (v2.3)
+  gdprCompliant?: boolean;
+  eeocCompliant?: boolean;
+  soc2Certified?: boolean;
+  hipaaCompliant?: boolean;
+  iso27001Certified?: boolean;
+  complianceDocumentationUrl?: string;
+  complianceNotes?: string;
+
+  // GROUP 4: Implementation Timeline (v2.3)
+  implementationTimelineWeeksMin?: number;
+  implementationTimelineWeeksMax?: number;
+  implementationTimelineDisplay?: string;
+  itHoursRequired?: number;
+  hrAdminHoursRequired?: number;
+  trainingHoursAdmin?: number;
+  trainingHoursEnduser?: number;
+  implementationPrerequisites?: string;
+  commonImplementationDelays?: string;
+
+  // GROUP 5: Case Study & Social Proof (v2.3)
+  caseStudyUrl?: string;
+  caseStudyCompanySize?: number;
+  caseStudyIndustry?: string;
+  caseStudyImplementationWeeks?: number;
+  caseStudyResults?: string;
+  notableCustomers?: string;
+
+  // GROUP 6: Integrations & Rich Media (v2.3)
+  otherIntegrations?: string;
+  demoVideoUrl?: string;
+  primaryCompetitorIds?: string[];
 }
 
 /**
@@ -81,7 +132,7 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     pricing,
     tags,
     companySizeFit: airtableTool.companySizeFit,
-    geography: [], // TODO: Add geography field to Airtable schema
+    geography: airtableTool.supportedRegions || [],
     compliance: [], // TODO: Fetch linked compliance tags
     tagline: airtableTool.shortDescription, // Use short description as tagline
     fullDescription: airtableTool.longDescription,
@@ -90,6 +141,57 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     integrationTags: [], // TODO: Fetch linked integration tags
     websiteUrl: airtableTool.websiteUrl,
     detailedPricing: airtableTool.pricingDetails,
+
+    // GROUP 1: Company Size & Regional Fit (v2.3)
+    idealCompanySize: airtableTool.idealCompanySize,
+    companySizeNotes: airtableTool.companySizeNotes,
+    supportedRegions: airtableTool.supportedRegions,
+
+    // GROUP 2: Pricing Engine (v2.3)
+    pricingAnnualMin: airtableTool.pricingAnnualMin,
+    pricingAnnualMax: airtableTool.pricingAnnualMax,
+    pricingCurrency: airtableTool.pricingCurrency,
+    pricingNotes: airtableTool.pricingNotes,
+    pricingDisplay: airtableTool.pricingDisplay,
+    pricingSourceUrl: airtableTool.pricingSourceUrl,
+    setupFee: airtableTool.setupFee,
+    setupFeeIncluded: airtableTool.setupFeeIncluded,
+    freeTrialAvailable: airtableTool.freeTrialAvailable,
+    freeTrialDurationDays: airtableTool.freeTrialDurationDays,
+    contractLengthOptions: airtableTool.contractLengthOptions,
+
+    // GROUP 3: Compliance & Certifications (v2.3)
+    gdprCompliant: airtableTool.gdprCompliant,
+    eeocCompliant: airtableTool.eeocCompliant,
+    soc2Certified: airtableTool.soc2Certified,
+    hipaaCompliant: airtableTool.hipaaCompliant,
+    iso27001Certified: airtableTool.iso27001Certified,
+    complianceDocumentationUrl: airtableTool.complianceDocumentationUrl,
+    complianceNotes: airtableTool.complianceNotes,
+
+    // GROUP 4: Implementation Timeline (v2.3)
+    implementationTimelineWeeksMin: airtableTool.implementationTimelineWeeksMin,
+    implementationTimelineWeeksMax: airtableTool.implementationTimelineWeeksMax,
+    implementationTimelineDisplay: airtableTool.implementationTimelineDisplay,
+    itHoursRequired: airtableTool.itHoursRequired,
+    hrAdminHoursRequired: airtableTool.hrAdminHoursRequired,
+    trainingHoursAdmin: airtableTool.trainingHoursAdmin,
+    trainingHoursEnduser: airtableTool.trainingHoursEnduser,
+    implementationPrerequisites: airtableTool.implementationPrerequisites,
+    commonImplementationDelays: airtableTool.commonImplementationDelays,
+
+    // GROUP 5: Case Study & Social Proof (v2.3)
+    caseStudyUrl: airtableTool.caseStudyUrl,
+    caseStudyCompanySize: airtableTool.caseStudyCompanySize,
+    caseStudyIndustry: airtableTool.caseStudyIndustry,
+    caseStudyImplementationWeeks: airtableTool.caseStudyImplementationWeeks,
+    caseStudyResults: airtableTool.caseStudyResults,
+    notableCustomers: airtableTool.notableCustomers,
+
+    // GROUP 6: Integrations & Rich Media (v2.3)
+    otherIntegrations: airtableTool.otherIntegrations,
+    demoVideoUrl: airtableTool.demoVideoUrl,
+    primaryCompetitorIds: airtableTool.primaryCompetitorIds,
   };
 }
 
@@ -591,4 +693,225 @@ export async function createToolIntegration(data: CreateToolIntegrationInput): P
     console.error('Error creating tool integration:', error);
     throw error;
   }
+}
+
+// ============================================================================
+// v2.3 Smart Filtering Functions
+// ============================================================================
+
+/**
+ * Company size bucket definitions
+ * Used for size-based filtering
+ */
+const SIZE_BUCKETS: Record<string, { min: number; max: number }> = {
+  '1-50': { min: 1, max: 50 },
+  '51-200': { min: 51, max: 200 },
+  '201-500': { min: 201, max: 500 },
+  '500+': { min: 501, max: 10000 },
+};
+
+/**
+ * Filters tools by annual budget range
+ * Returns tools where pricing overlaps with buyer's budget
+ *
+ * @param minBudget - Buyer's minimum annual budget (GBP)
+ * @param maxBudget - Buyer's maximum annual budget (GBP)
+ * @param vertical - Optional: filter by vertical
+ * @returns Array of tools that fit budget
+ */
+export async function getToolsByBudgetRange(
+  minBudget: number,
+  maxBudget: number,
+  vertical?: string
+): Promise<Tool[]> {
+  const allTools = vertical ? await getToolsByVertical(vertical) : await getAllTools();
+
+  return allTools.filter((tool) => {
+    // Skip tools with no pricing data
+    if (!tool.pricingAnnualMin || !tool.pricingAnnualMax) {
+      return false;
+    }
+
+    // Check if there's any overlap between buyer budget and tool pricing
+    // Ranges overlap if: toolMin <= buyerMax AND toolMax >= buyerMin
+    return tool.pricingAnnualMin <= maxBudget && tool.pricingAnnualMax >= minBudget;
+  });
+}
+
+/**
+ * Filters tools by company size fit
+ * Uses idealCompanySize buckets to determine fit
+ *
+ * @param companySize - Exact employee count
+ * @param vertical - Optional: filter by vertical
+ * @returns Array of tools that fit company size
+ */
+export async function getToolsByCompanySize(
+  companySize: number,
+  vertical?: string
+): Promise<Tool[]> {
+  const allTools = vertical ? await getToolsByVertical(vertical) : await getAllTools();
+
+  return allTools.filter((tool) => {
+    if (!tool.idealCompanySize || tool.idealCompanySize.length === 0) {
+      return true; // No size preference = fits all sizes
+    }
+
+    // Check if company size falls in any ideal bucket
+    return tool.idealCompanySize.some((bucket) => {
+      const range = SIZE_BUCKETS[bucket];
+      return range && companySize >= range.min && companySize <= range.max;
+    });
+  });
+}
+
+/**
+ * Filters tools by supported region
+ *
+ * @param region - Buyer's region (UK, US, EU, Australia, Canada)
+ * @param vertical - Optional: filter by vertical
+ * @returns Array of tools that support the region
+ */
+export async function getToolsByRegion(
+  region: string,
+  vertical?: string
+): Promise<Tool[]> {
+  const allTools = vertical ? await getToolsByVertical(vertical) : await getAllTools();
+
+  return allTools.filter((tool) => {
+    if (!tool.supportedRegions || tool.supportedRegions.length === 0) {
+      return false;
+    }
+
+    // Tools supporting "Global" match any region
+    if (tool.supportedRegions.includes('Global')) {
+      return true;
+    }
+
+    // Otherwise check exact region match
+    return tool.supportedRegions.includes(region);
+  });
+}
+
+/**
+ * Filters tools by compliance requirements
+ * Returns tools that meet ALL specified compliance needs
+ *
+ * @param complianceNeeds - Array of required compliance (["GDPR", "SOC2"])
+ * @param vertical - Optional: filter by vertical
+ * @returns Array of tools meeting all compliance requirements
+ */
+export async function getToolsByCompliance(
+  complianceNeeds: string[],
+  vertical?: string
+): Promise<Tool[]> {
+  if (complianceNeeds.length === 0) {
+    return vertical ? await getToolsByVertical(vertical) : await getAllTools();
+  }
+
+  const allTools = vertical ? await getToolsByVertical(vertical) : await getAllTools();
+
+  return allTools.filter((tool) => {
+    return complianceNeeds.every((requirement) => {
+      switch (requirement) {
+        case 'GDPR':
+          return tool.gdprCompliant === true;
+        case 'EEOC':
+          return tool.eeocCompliant === true;
+        case 'SOC2':
+          return tool.soc2Certified === true;
+        case 'HIPAA':
+          return tool.hipaaCompliant === true;
+        case 'ISO27001':
+          return tool.iso27001Certified === true;
+        default:
+          return false;
+      }
+    });
+  });
+}
+
+/**
+ * Advanced filtering combining multiple criteria
+ * Used for Request Board matching and smart filters UI
+ *
+ * @param filters - Object with optional filter criteria
+ * @returns Array of tools matching ALL specified criteria
+ */
+export async function getToolsByFilters(filters: {
+  vertical?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  companySize?: number;
+  region?: string;
+  complianceNeeds?: string[];
+}): Promise<Tool[]> {
+  let tools = filters.vertical
+    ? await getToolsByVertical(filters.vertical)
+    : await getAllTools();
+
+  // Apply budget filter
+  if (filters.budgetMin !== undefined && filters.budgetMax !== undefined) {
+    tools = tools.filter((tool) => {
+      if (!tool.pricingAnnualMin || !tool.pricingAnnualMax) return false;
+      return (
+        tool.pricingAnnualMin <= filters.budgetMax! &&
+        tool.pricingAnnualMax >= filters.budgetMin!
+      );
+    });
+  }
+
+  // Apply company size filter
+  if (filters.companySize !== undefined) {
+    tools = tools.filter((tool) => {
+      if (!tool.idealCompanySize || tool.idealCompanySize.length === 0) {
+        return true;
+      }
+      return tool.idealCompanySize.some((bucket) => {
+        const range = SIZE_BUCKETS[bucket];
+        return (
+          range &&
+          filters.companySize! >= range.min &&
+          filters.companySize! <= range.max
+        );
+      });
+    });
+  }
+
+  // Apply region filter
+  if (filters.region) {
+    tools = tools.filter((tool) => {
+      if (!tool.supportedRegions || tool.supportedRegions.length === 0) {
+        return false;
+      }
+      return (
+        tool.supportedRegions.includes('Global') ||
+        tool.supportedRegions.includes(filters.region!)
+      );
+    });
+  }
+
+  // Apply compliance filter
+  if (filters.complianceNeeds && filters.complianceNeeds.length > 0) {
+    tools = tools.filter((tool) => {
+      return filters.complianceNeeds!.every((requirement) => {
+        switch (requirement) {
+          case 'GDPR':
+            return tool.gdprCompliant === true;
+          case 'EEOC':
+            return tool.eeocCompliant === true;
+          case 'SOC2':
+            return tool.soc2Certified === true;
+          case 'HIPAA':
+            return tool.hipaaCompliant === true;
+          case 'ISO27001':
+            return tool.iso27001Certified === true;
+          default:
+            return false;
+        }
+      });
+    });
+  }
+
+  return tools;
 }

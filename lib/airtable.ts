@@ -138,6 +138,57 @@ export interface ToolFields {
   request_matches?: number;
   date_added?: string;
   last_updated?: string;
+
+  // GROUP 1: Company Size & Regional Fit (v2.3)
+  ideal_company_size?: string[];
+  company_size_notes?: string;
+  supported_regions?: string[];
+
+  // GROUP 2: Pricing Engine (v2.3)
+  pricing_annual_min?: number;
+  pricing_annual_max?: number;
+  pricing_currency?: 'GBP' | 'USD' | 'EUR';
+  pricing_notes?: string;
+  pricing_display?: string; // Airtable formula field
+  pricing_source_url?: string;
+  setup_fee?: number;
+  setup_fee_included?: boolean;
+  free_trial_available?: boolean;
+  free_trial_duration_days?: number;
+  contract_length_options?: string[];
+
+  // GROUP 3: Compliance & Certifications (v2.3)
+  gdpr_compliant?: boolean;
+  eeoc_compliant?: boolean;
+  soc2_certified?: boolean;
+  hipaa_compliant?: boolean;
+  iso27001_certified?: boolean;
+  compliance_documentation_url?: string;
+  compliance_notes?: string;
+
+  // GROUP 4: Implementation Timeline (v2.3)
+  implementation_timeline_weeks_min?: number;
+  implementation_timeline_weeks_max?: number;
+  implementation_timeline_display?: string; // Airtable formula field
+  it_hours_required?: number;
+  hr_admin_hours_required?: number;
+  training_hours_admin?: number;
+  training_hours_enduser?: number;
+  implementation_prerequisites?: string;
+  common_implementation_delays?: string;
+
+  // GROUP 5: Case Study & Social Proof (v2.3)
+  case_study_url?: string;
+  case_study_company_size?: number;
+  case_study_industry?: string;
+  case_study_implementation_weeks?: number;
+  case_study_results?: string;
+  notable_customers?: string;
+
+  // GROUP 6: Integrations & Rich Media (v2.3)
+  other_integrations?: string;
+  demo_video_url?: string;
+  primary_competitor_ids?: string[];
 }
 
 /**
@@ -167,6 +218,57 @@ export interface Tool {
   requestMatches?: number;
   dateAdded?: string;
   lastUpdated?: string;
+
+  // GROUP 1: Company Size & Regional Fit (v2.3)
+  idealCompanySize?: string[];
+  companySizeNotes?: string;
+  supportedRegions?: string[];
+
+  // GROUP 2: Pricing Engine (v2.3)
+  pricingAnnualMin?: number;
+  pricingAnnualMax?: number;
+  pricingCurrency?: 'GBP' | 'USD' | 'EUR';
+  pricingNotes?: string;
+  pricingDisplay?: string;
+  pricingSourceUrl?: string;
+  setupFee?: number;
+  setupFeeIncluded?: boolean;
+  freeTrialAvailable?: boolean;
+  freeTrialDurationDays?: number;
+  contractLengthOptions?: string[];
+
+  // GROUP 3: Compliance & Certifications (v2.3)
+  gdprCompliant?: boolean;
+  eeocCompliant?: boolean;
+  soc2Certified?: boolean;
+  hipaaCompliant?: boolean;
+  iso27001Certified?: boolean;
+  complianceDocumentationUrl?: string;
+  complianceNotes?: string;
+
+  // GROUP 4: Implementation Timeline (v2.3)
+  implementationTimelineWeeksMin?: number;
+  implementationTimelineWeeksMax?: number;
+  implementationTimelineDisplay?: string;
+  itHoursRequired?: number;
+  hrAdminHoursRequired?: number;
+  trainingHoursAdmin?: number;
+  trainingHoursEnduser?: number;
+  implementationPrerequisites?: string;
+  commonImplementationDelays?: string;
+
+  // GROUP 5: Case Study & Social Proof (v2.3)
+  caseStudyUrl?: string;
+  caseStudyCompanySize?: number;
+  caseStudyIndustry?: string;
+  caseStudyImplementationWeeks?: number;
+  caseStudyResults?: string;
+  notableCustomers?: string;
+
+  // GROUP 6: Integrations & Rich Media (v2.3)
+  otherIntegrations?: string;
+  demoVideoUrl?: string;
+  primaryCompetitorIds?: string[];
 }
 
 /**
@@ -440,6 +542,57 @@ function mapToolRecord(record: AirtableRecord<ToolFields>): Tool {
     requestMatches: fields.request_matches,
     dateAdded: fields.date_added,
     lastUpdated: fields.last_updated,
+
+    // GROUP 1: Company Size & Regional Fit (v2.3)
+    idealCompanySize: fields.ideal_company_size,
+    companySizeNotes: fields.company_size_notes,
+    supportedRegions: fields.supported_regions,
+
+    // GROUP 2: Pricing Engine (v2.3)
+    pricingAnnualMin: fields.pricing_annual_min,
+    pricingAnnualMax: fields.pricing_annual_max,
+    pricingCurrency: fields.pricing_currency,
+    pricingNotes: fields.pricing_notes,
+    pricingDisplay: fields.pricing_display,
+    pricingSourceUrl: fields.pricing_source_url,
+    setupFee: fields.setup_fee,
+    setupFeeIncluded: fields.setup_fee_included,
+    freeTrialAvailable: fields.free_trial_available,
+    freeTrialDurationDays: fields.free_trial_duration_days,
+    contractLengthOptions: fields.contract_length_options,
+
+    // GROUP 3: Compliance & Certifications (v2.3)
+    gdprCompliant: fields.gdpr_compliant,
+    eeocCompliant: fields.eeoc_compliant,
+    soc2Certified: fields.soc2_certified,
+    hipaaCompliant: fields.hipaa_compliant,
+    iso27001Certified: fields.iso27001_certified,
+    complianceDocumentationUrl: fields.compliance_documentation_url,
+    complianceNotes: fields.compliance_notes,
+
+    // GROUP 4: Implementation Timeline (v2.3)
+    implementationTimelineWeeksMin: fields.implementation_timeline_weeks_min,
+    implementationTimelineWeeksMax: fields.implementation_timeline_weeks_max,
+    implementationTimelineDisplay: fields.implementation_timeline_display,
+    itHoursRequired: fields.it_hours_required,
+    hrAdminHoursRequired: fields.hr_admin_hours_required,
+    trainingHoursAdmin: fields.training_hours_admin,
+    trainingHoursEnduser: fields.training_hours_enduser,
+    implementationPrerequisites: fields.implementation_prerequisites,
+    commonImplementationDelays: fields.common_implementation_delays,
+
+    // GROUP 5: Case Study & Social Proof (v2.3)
+    caseStudyUrl: fields.case_study_url,
+    caseStudyCompanySize: fields.case_study_company_size,
+    caseStudyIndustry: fields.case_study_industry,
+    caseStudyImplementationWeeks: fields.case_study_implementation_weeks,
+    caseStudyResults: fields.case_study_results,
+    notableCustomers: fields.notable_customers,
+
+    // GROUP 6: Integrations & Rich Media (v2.3)
+    otherIntegrations: fields.other_integrations,
+    demoVideoUrl: fields.demo_video_url,
+    primaryCompetitorIds: fields.primary_competitor_ids,
   };
 }
 
