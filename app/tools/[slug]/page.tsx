@@ -1,134 +1,76 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { Container } from "@/components/layout/container";
-import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getToolBySlug, getIntegrationsForTool } from "@/lib/airtable-helpers";
+import { ToolHero } from "@/components/tools/tool-hero";
+import { ToolQuickFacts } from "@/components/tools/tool-quick-facts";
+import { ToolPricingSection } from "@/components/tools/tool-pricing-section";
+import { ToolImplementationSection } from "@/components/tools/tool-implementation-section";
+import { ToolIntegrationsSection } from "@/components/tools/tool-integrations-section";
+import { ToolComplianceSection } from "@/components/tools/tool-compliance-section";
+import { ToolCaseStudySection } from "@/components/tools/tool-case-study-section";
+import { ToolAlternatives } from "@/components/tools/tool-alternatives";
 import { Separator } from "@/components/ui/separator";
-import { ExternalLink } from "lucide-react";
-import { getToolBySlug, getAllArticles } from "@/lib/airtable-helpers";
 
-type ToolPageProps = {
-  params: Promise<{ slug: string }>;
-};
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+  searchParams?: Promise<{
+    companySize?: string; // For personalized timeline estimates
+  }>;
+}
 
-export default async function ToolPage({ params }: ToolPageProps) {
+// Force dynamic rendering (no static generation)
+export const dynamic = 'force-dynamic';
+
+export default async function ToolDetailPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const search = searchParams ? await searchParams : {};
 
-  // Fetch tool from Airtable
-  let tool: Awaited<ReturnType<typeof getToolBySlug>> = null;
-  try {
-    tool = await getToolBySlug(slug);
-  } catch (error) {
-    console.error("Error fetching tool from Airtable:", error);
-    tool = null;
-  }
+  const tool = await getToolBySlug(slug);
 
   if (!tool) {
-    return notFound();
+    notFound();
   }
 
-  // Get related articles (first 3 for now)
-  let articles: Awaited<ReturnType<typeof getAllArticles>> = [];
-  try {
-    const allArticles = await getAllArticles();
-    articles = allArticles.slice(0, 3);
-  } catch (error) {
-    console.error("Error fetching articles:", error);
-    articles = [];
-  }
+  // Fetch integrations with quality ratings
+  const integrations = await getIntegrationsForTool(tool.id);
+
+  // Parse company size from search params (for personalized estimates)
+  const buyerCompanySize = search.companySize
+    ? Number(search.companySize)
+    : undefined;
 
   return (
-    <Container className="py-10 md:py-12">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "HR & Talent", href: "/hr-talent" },
-          { label: tool.name },
-        ]}
-      />
+    <Container className="py-12">
+      {/* Hero section with name, logo, pricing, CTA */}
+      <ToolHero tool={tool} />
 
-      {/* Tool Header */}
-      <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-        {/* Left: Tool Info */}
-        <div className="flex-1">
-          <div className="flex items-center gap-4">
-            {tool.logoUrl ? (
-              <img
-                src={tool.logoUrl}
-                alt={`${tool.name} logo`}
-                className="h-16 w-16 rounded-lg border object-cover"
-              />
-            ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-lg border bg-muted">
-                <span className="text-2xl font-bold text-primary">
-                  {tool.name.charAt(0)}
-                </span>
+      <Separator className="my-8" />
+
+      {/* Quick facts bar */}
+      <ToolQuickFacts tool={tool} buyerCompanySize={buyerCompanySize} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+        {/* Main content - 2 columns on desktop */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Long description */}
+          {tool.fullDescription && (
+            <section>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 whitespace-pre-line">
+                  {tool.fullDescription}
+                </p>
               </div>
-            )}
-            <div>
-              <h1 className="mb-2">{tool.name}</h1>
-              <p className="text-lg text-muted-foreground">
-                {tool.tagline || tool.shortDescription}
-              </p>
-            </div>
-          </div>
+            </section>
+          )}
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {tool.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: CTA */}
-        <Card className="w-full md:w-80">
-          <CardHeader>
-            <CardTitle className="text-lg">Pricing</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-2xl font-semibold">{tool.pricing}</p>
-            {tool.websiteUrl && (
-              <Button asChild className="w-full">
-                <Link
-                  href={tool.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Visit Website
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <Separator className="my-12" />
-
-      {/* Tool Details */}
-      <div className="grid gap-12 lg:grid-cols-[1fr_320px]">
-        {/* Main Content */}
-        <div className="space-y-8">
-          {/* Description */}
-          <section>
-            <h2 className="mb-4">About {tool.name}</h2>
-            <div className="prose prose-slate max-w-none">
-              <p className="text-muted-foreground">
-                {tool.fullDescription || tool.shortDescription}
-              </p>
-            </div>
-          </section>
-
-          {/* Features */}
+          {/* Features list */}
           {tool.features && tool.features.length > 0 && (
             <section>
-              <h2 className="mb-4">Key Features</h2>
-              <ul className="list-inside list-disc space-y-2 text-muted-foreground">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Features</h2>
+              <ul className="list-disc list-inside space-y-2 text-gray-700">
                 {tool.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
@@ -136,139 +78,77 @@ export default async function ToolPage({ params }: ToolPageProps) {
             </section>
           )}
 
-          {/* Detailed Pricing */}
-          {tool.detailedPricing && (
+          {/* Demo video */}
+          {tool.demoVideoUrl && (
             <section>
-              <h2 className="mb-4">Pricing Details</h2>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-muted-foreground">{tool.detailedPricing}</p>
-                </CardContent>
-              </Card>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Demo</h2>
+              <div className="aspect-video">
+                <iframe
+                  src={tool.demoVideoUrl}
+                  className="w-full h-full rounded-lg"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
             </section>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <aside className="space-y-6">
-          {/* Company Size Fit */}
-          {tool.companySizeFit && tool.companySizeFit.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Company Size Fit</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {tool.companySizeFit.map((size) => (
-                    <Badge key={size} variant="outline">
-                      {size} employees
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Compliance */}
-          {tool.complianceTags && tool.complianceTags.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Compliance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {tool.complianceTags.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           )}
 
           {/* Integrations */}
-          {tool.integrationTags && tool.integrationTags.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Integrations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {tool.integrationTags.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {integrations.length > 0 && (
+            <ToolIntegrationsSection
+              integrations={integrations}
+              otherIntegrations={tool.otherIntegrations}
+            />
           )}
 
-          {/* Geography */}
-          {tool.geography && tool.geography.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Available In</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {tool.geography.map((geo) => (
-                    <Badge key={geo} variant="outline">
-                      {geo}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Implementation timeline */}
+          <ToolImplementationSection
+            tool={tool}
+            buyerCompanySize={buyerCompanySize}
+          />
+
+          {/* Compliance */}
+          <ToolComplianceSection tool={tool} />
+
+          {/* Case study */}
+          {tool.caseStudyUrl && (
+            <ToolCaseStudySection tool={tool} />
           )}
+        </div>
+
+        {/* Sidebar - 1 column on desktop */}
+        <aside className="lg:col-span-1 space-y-6">
+          {/* Pricing card (sticky) */}
+          <div className="lg:sticky lg:top-6">
+            <ToolPricingSection tool={tool} />
+          </div>
         </aside>
       </div>
 
-      {/* Related Insights */}
-      {articles.length > 0 && (
+      {/* Alternatives section at bottom */}
+      {tool.primaryCompetitorIds && tool.primaryCompetitorIds.length > 0 && (
         <>
           <Separator className="my-12" />
-          <section>
-            <h2 className="mb-6">Related Insights</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {articles.map((article) => (
-                <Card key={article.id} className="overflow-hidden">
-                  <CardHeader>
-                    <Badge variant="outline" className="mb-2 w-fit">
-                      {article.category}
-                    </Badge>
-                    <CardTitle className="line-clamp-2 text-base">
-                      {article.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {article.excerpt}
-                    </p>
-                    <Link
-                      href={`/articles/${article.slug}`}
-                      className="mt-4 inline-flex items-center text-sm font-medium text-primary hover:underline"
-                    >
-                      Read more →
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
+          <ToolAlternatives toolId={tool.id} competitorIds={tool.primaryCompetitorIds} />
         </>
       )}
-
-      {/* Back Link */}
-      <div className="mt-12">
-        <Link
-          href="/hr-talent"
-          className="inline-flex items-center text-sm font-medium text-primary hover:underline"
-        >
-          ← Back to HR & Talent Tools
-        </Link>
-      </div>
     </Container>
   );
+}
+
+// Metadata for SEO
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const tool = await getToolBySlug(slug);
+
+  if (!tool) {
+    return {
+      title: "Tool Not Found",
+    };
+  }
+
+  return {
+    title: `${tool.name} - AI Tool for ${tool.category}`,
+    description: tool.shortDescription || tool.fullDescription?.slice(0, 160),
+  };
 }

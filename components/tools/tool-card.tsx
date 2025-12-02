@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Tool } from "@/lib/mock-data";
+import type { Tool } from "@/lib/airtable-helpers";
 
 type ToolCardProps = {
   tool: Tool;
