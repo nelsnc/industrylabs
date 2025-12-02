@@ -4,6 +4,8 @@
  * Tests region and compliance filtering logic
  */
 
+export {}; // Make this a module to avoid global scope conflicts
+
 const tools = [
   {
     name: 'Test Tool v2.3',
