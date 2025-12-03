@@ -197,7 +197,8 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     primaryCompetitorIds: airtableTool.primaryCompetitorIds,
 
     // Analytics
-    page_views: airtableTool.page_views,
+    // Airtable Tool model uses camelCase (pageViews); keep snake_case for frontend compatibility
+    page_views: airtableTool.pageViews ?? (airtableTool as { page_views?: number }).page_views,
   };
 }
 
