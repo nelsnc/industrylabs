@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateRecord, getAllRecords } from "@/lib/airtable";
+import { updateRecord, getAllRecords, type ToolFields } from "@/lib/airtable";
 
 const viewCache = new Map<string, number>();
 
@@ -41,7 +41,7 @@ export async function POST(
 
     viewCache.set(cacheKey, now);
 
-    const toolsRecords = await getAllRecords("TOOLS");
+    const toolsRecords = await getAllRecords<ToolFields>("TOOLS");
     const toolRecord = toolsRecords.find((record) => record.id === toolId);
 
     if (!toolRecord) {
@@ -51,7 +51,7 @@ export async function POST(
       );
     }
 
-    const currentViews = (toolRecord.fields.page_views as number) || 0;
+    const currentViews = toolRecord.fields.page_views || 0;
 
     await updateRecord("TOOLS", toolId, {
       page_views: currentViews + 1,
