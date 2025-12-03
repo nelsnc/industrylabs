@@ -1,13 +1,18 @@
 import { Container } from "@/components/layout/container";
-import { HrToolsGrid } from "@/components/hr/hr-tools-grid";
 import { Badge } from "@/components/ui/badge";
 import { getToolsByFilters } from "@/lib/airtable-helpers";
 import { hrTools as mockHrTools } from "@/lib/mock-data";
 import { ToolFilters } from "@/components/filters/tool-filters";
 import { ActiveFilters } from "@/components/filters/active-filters";
 import { MobileFilterSheet } from "@/components/filters/mobile-filter-sheet";
+import { CategoryNavigation } from "@/components/hr/category-navigation";
+import { CategorySection } from "@/components/hr/category-section";
+import { ToolSearchBar } from "@/components/tools/tool-search-bar";
 import { Suspense } from "react";
 import { FilterSkeleton } from "@/components/filters/filter-skeleton";
+import { UserPlus, GraduationCap, Target, Heart, BarChart3 } from "lucide-react";
+import Link from "next/link";
+import type { Tool } from "@/lib/airtable-helpers";
 
 interface PageProps {
   searchParams: Promise<{
@@ -17,28 +22,80 @@ interface PageProps {
     region?: string;
     compliance?: string;
     integrations?: string;
+    category?: string;
+    search?: string;
   }>;
 }
 
-// Force dynamic rendering (no static generation)
 export const dynamic = 'force-dynamic';
 
+const categoryDefinitions = [
+  {
+    id: "recruiting-ats",
+    name: "Recruiting & ATS",
+    slug: "recruiting-ats",
+    description: "AI-powered applicant tracking and recruiting tools",
+    icon: UserPlus,
+    keywords: ["recruit", "ats", "hiring", "applicant", "candidate", "sourcing", "talent acquisition"],
+  },
+  {
+    id: "onboarding",
+    name: "Onboarding",
+    slug: "onboarding",
+    description: "Streamline new hire onboarding and training programs",
+    icon: GraduationCap,
+    keywords: ["onboard", "training", "learning", "new hire", "orientation"],
+  },
+  {
+    id: "performance-management",
+    name: "Performance Management",
+    slug: "performance-management",
+    description: "Goal setting, reviews, and continuous feedback tools",
+    icon: Target,
+    keywords: ["performance", "review", "goal", "okr", "feedback", "evaluation", "appraisal"],
+  },
+  {
+    id: "employee-engagement",
+    name: "Employee Engagement",
+    slug: "employee-engagement",
+    description: "Measure and improve employee satisfaction and culture",
+    icon: Heart,
+    keywords: ["engagement", "culture", "satisfaction", "pulse", "survey", "wellbeing", "retention"],
+  },
+  {
+    id: "hr-analytics",
+    name: "HR Analytics",
+    slug: "hr-analytics",
+    description: "Workforce analytics and people data insights",
+    icon: BarChart3,
+    keywords: ["analytics", "reporting", "insights", "data", "metrics", "workforce planning"],
+  },
+];
+
+function getToolsForCategory(tools: Tool[], categorySlug: string) {
+  const category = categoryDefinitions.find((c) => c.slug === categorySlug);
+  if (!category) return [];
+
+  return tools.filter((tool) => {
+    const toolText = `${tool.name} ${tool.shortDescription || ""} ${tool.fullDescription || ""}`.toLowerCase();
+    return category.keywords.some((keyword) => toolText.includes(keyword));
+  });
+}
+
 export default async function HrTalentPage({ searchParams }: PageProps) {
-  // Await searchParams (Next.js 15+ requirement)
   const params = await searchParams;
 
-  // Parse filter params from URL
   const companySizes = params.size?.split(",").filter(Boolean) || undefined;
   const budgetMin = params.budgetMin ? parseInt(params.budgetMin, 10) : undefined;
   const budgetMax = params.budgetMax ? parseInt(params.budgetMax, 10) : undefined;
   const regions = params.region?.split(",").filter(Boolean) || undefined;
   const complianceNeeds = params.compliance?.split(",").filter(Boolean) || undefined;
   const requiredIntegrations = params.integrations?.split(",").filter(Boolean) || undefined;
+  const selectedCategory = params.category;
+  const searchQuery = params.search?.toLowerCase().trim();
 
-  // Fetch all HR tools first
   let tools: Awaited<ReturnType<typeof getToolsByFilters>>;
   try {
-    // Start with all HR & Talent tools
     tools = await getToolsByFilters({ vertical: "HR & Talent" });
 
     if (tools.length === 0) {
@@ -46,34 +103,24 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
       tools = mockHrTools;
     }
 
-    // CLIENT-SIDE FILTERING (since v2.3 fields aren't fully populated yet)
-
-    // Filter by company size (using v2.3 field: idealCompanySize, fallback to old companySizeFit)
     if (companySizes && companySizes.length > 0) {
       tools = tools.filter((tool) => {
-        // Prefer v2.3 idealCompanySize, fallback to old companySizeFit
         const sizeField = tool.idealCompanySize || tool.companySizeFit;
-
-        // If tool has no size preference, exclude it
         if (!sizeField || sizeField.length === 0) {
           return false;
         }
-        // Check if any selected size matches tool's size field
         return companySizes.some((selectedSize) =>
           sizeField?.includes(selectedSize)
         );
       });
     }
 
-    // Filter by budget range (using v2.3 fields if available)
     if (budgetMin !== undefined || budgetMax !== undefined) {
       tools = tools.filter((tool) => {
-        // If v2.3 pricing fields are populated, use them
         if (tool.pricingAnnualMin !== undefined && tool.pricingAnnualMax !== undefined) {
           const toolMin = tool.pricingAnnualMin;
           const toolMax = tool.pricingAnnualMax;
 
-          // Overlap logic: tool range overlaps with budget range
           if (budgetMin && budgetMax) {
             return toolMin <= budgetMax && toolMax >= budgetMin;
           } else if (budgetMin) {
@@ -82,29 +129,22 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
             return toolMin <= budgetMax;
           }
         }
-
-        // If v2.3 fields not populated, include all tools (can't filter)
         return true;
       });
     }
 
-    // Filter by region (using v2.3 supportedRegions field)
     if (regions && regions.length > 0) {
       tools = tools.filter((tool) => {
         if (!tool.supportedRegions || tool.supportedRegions.length === 0) {
           return false;
         }
-        // Tool must support at least one of the selected regions
-        // OR support "Global" (which matches all regions)
         return tool.supportedRegions.includes('Global') ||
           regions.some((selectedRegion) => tool.supportedRegions?.includes(selectedRegion));
       });
     }
 
-    // Filter by compliance (using v2.3 compliance fields)
     if (complianceNeeds && complianceNeeds.length > 0) {
       tools = tools.filter((tool) => {
-        // Tool must meet ALL selected compliance requirements (AND logic)
         return complianceNeeds.every((requirement) => {
           switch (requirement) {
             case 'GDPR':
@@ -124,47 +164,60 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
       });
     }
 
-    // Filter by integrations (using old schema relationship)
     if (requiredIntegrations && requiredIntegrations.length > 0) {
       tools = tools.filter((tool) => {
         if (!tool.otherIntegrations) return false;
-        // Check if tool has all required integrations
         return requiredIntegrations.every((required) =>
           tool.otherIntegrations?.toLowerCase().includes(required.toLowerCase())
         );
       });
+    }
+
+    if (searchQuery) {
+      tools = tools.filter(
+        (tool) =>
+          tool.name.toLowerCase().includes(searchQuery) ||
+          tool.shortDescription?.toLowerCase().includes(searchQuery) ||
+          tool.fullDescription?.toLowerCase().includes(searchQuery)
+      );
     }
   } catch (error) {
     console.error("Failed to load HR tools from Airtable:", error);
     tools = mockHrTools;
   }
 
+  const hasActiveFilters =
+    companySizes !== undefined ||
+    budgetMin !== undefined ||
+    budgetMax !== undefined ||
+    regions !== undefined ||
+    complianceNeeds !== undefined ||
+    requiredIntegrations !== undefined ||
+    !!searchQuery;
+
   return (
     <Container className="py-12 md:py-16">
-      {/* Hero Section */}
       <div className="mb-12">
         <Badge variant="outline" className="mb-4">
           Vertical: HR & Talent
         </Badge>
-        <h1 className="mb-4">HR & Talent AI Tools</h1>
+        <h1 className="mb-4 text-4xl font-bold text-gray-900">AI Tools for HR & Talent Teams</h1>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Discover AI-powered tools for recruiting, screening, onboarding, performance management,
-          and employee engagement. Curated for HR teams at companies with 50-500 employees.
+          Curated AI-powered tools for recruiting, onboarding, performance management,
+          engagement, and analytics. Organized by use case and verified for mid-market companies.
         </p>
       </div>
 
-      {/* Main Content */}
       <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
-        {/* Filters Sidebar - Hidden on mobile */}
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <Suspense fallback={<FilterSkeleton />}>
             <ToolFilters />
           </Suspense>
         </aside>
 
-        {/* Tools Grid */}
         <div>
-          {/* Active Filters */}
+          <ToolSearchBar currentSearch={searchQuery || ""} />
+
           <Suspense fallback={null}>
             <div className="mb-4">
               <ActiveFilters />
@@ -181,14 +234,58 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
           </div>
 
           {tools.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground mb-2">No tools match your filters</p>
-              <p className="text-sm text-muted-foreground">
-                Try adjusting your filter criteria to see more results
+            <div className="text-center py-12 p-12 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-gray-600 mb-4">
+                No tools match your current filters.
               </p>
+              <Link
+                href="/hr-talent"
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Clear all filters
+              </Link>
             </div>
           ) : (
-            <HrToolsGrid tools={tools} />
+            <>
+              <CategoryNavigation />
+
+              <div className="space-y-16 mt-8">
+                {selectedCategory ? (
+                  (() => {
+                    const category = categoryDefinitions.find((c) => c.slug === selectedCategory);
+                    if (!category) return null;
+
+                    const categoryTools = getToolsForCategory(tools, category.slug);
+                    return (
+                      <CategorySection
+                        key={category.id}
+                        id={category.slug}
+                        name={category.name}
+                        description={category.description}
+                        icon={category.icon}
+                        tools={categoryTools}
+                        showCount={100}
+                      />
+                    );
+                  })()
+                ) : (
+                  categoryDefinitions.map((category) => {
+                    const categoryTools = getToolsForCategory(tools, category.slug);
+                    return (
+                      <CategorySection
+                        key={category.id}
+                        id={category.slug}
+                        name={category.name}
+                        description={category.description}
+                        icon={category.icon}
+                        tools={categoryTools}
+                        showCount={8}
+                      />
+                    );
+                  })
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
