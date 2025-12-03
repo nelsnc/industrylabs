@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { getToolBySlug, getIntegrationsForTool } from "@/lib/airtable-helpers";
 import { ToolHero } from "@/components/tools/tool-hero";
@@ -10,6 +11,7 @@ import { ToolComplianceSection } from "@/components/tools/tool-compliance-sectio
 import { ToolCaseStudySection } from "@/components/tools/tool-case-study-section";
 import { ToolAlternatives } from "@/components/tools/tool-alternatives";
 import { Separator } from "@/components/ui/separator";
+import { Scale } from "lucide-react";
 
 interface PageProps {
   params: Promise<{
@@ -17,6 +19,7 @@ interface PageProps {
   }>;
   searchParams?: Promise<{
     companySize?: string; // For personalized timeline estimates
+    from?: string; // For bidirectional comparison navigation
   }>;
 }
 
@@ -41,8 +44,35 @@ export default async function ToolDetailPage({ params, searchParams }: PageProps
     ? Number(search.companySize)
     : undefined;
 
+  // Check if user came from another tool (for "Compare with X" link)
+  const referrerSlug = search.from;
+  const referrerTool = referrerSlug ? await getToolBySlug(referrerSlug) : null;
+
   return (
     <Container className="py-12">
+      {/* Show "Comparing with X" banner if came from competitor */}
+      {referrerTool && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Scale className="w-5 h-5 text-blue-600 shrink-0" />
+            <div>
+              <div className="text-sm font-semibold text-blue-900">
+                Comparing with {referrerTool.name}
+              </div>
+              <div className="text-xs text-blue-700">
+                You're viewing an alternative from {referrerTool.name}'s comparison
+              </div>
+            </div>
+          </div>
+          <Link
+            href={`/tools/${referrerTool.slug}`}
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap"
+          >
+            Back to {referrerTool.name}
+          </Link>
+        </div>
+      )}
+
       {/* Hero section with name, logo, pricing, CTA */}
       <ToolHero tool={tool} />
 
@@ -129,7 +159,15 @@ export default async function ToolDetailPage({ params, searchParams }: PageProps
       {tool.primaryCompetitorIds && tool.primaryCompetitorIds.length > 0 && (
         <>
           <Separator className="my-12" />
-          <ToolAlternatives toolId={tool.id} competitorIds={tool.primaryCompetitorIds} />
+          <ToolAlternatives
+            currentTool={{
+              id: tool.id,
+              name: tool.name,
+              slug: tool.slug,
+              category: tool.category,
+            }}
+            competitorIds={tool.primaryCompetitorIds}
+          />
         </>
       )}
     </Container>

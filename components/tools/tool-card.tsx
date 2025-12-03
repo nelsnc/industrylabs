@@ -18,6 +18,7 @@ interface ToolCardProps {
   integrationPreview?: string[]; // Optional: ["Workday", "BambooHR", "Slack"]
   showPricing?: boolean; // Optional: hide pricing on certain pages
   variant?: "default" | "compact"; // Optional: compact for grids
+  referrerSlug?: string; // Optional: for comparison tracking
 }
 
 export function ToolCard({
@@ -25,7 +26,13 @@ export function ToolCard({
   integrationPreview = [],
   showPricing = true,
   variant = "default",
+  referrerSlug,
 }: ToolCardProps) {
+  // Build detail URL with optional referrer for comparison tracking
+  const detailUrl = referrerSlug
+    ? `/tools/${tool.slug}?from=${referrerSlug}`
+    : `/tools/${tool.slug}`;
+
   // Format pricing if available
   const pricingData =
     (tool.pricingAnnualMin || tool.pricingAnnualMax) && showPricing
@@ -176,7 +183,7 @@ export function ToolCard({
 
       <CardFooter>
         <Button asChild variant="outline" className="w-full group">
-          <Link href={`/tools/${tool.slug}`}>
+          <Link href={detailUrl}>
             View Details
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
