@@ -5,7 +5,8 @@ import { HomeCategoriesPreview } from "@/components/home/home-categories";
 import { HomeFeaturedTools } from "@/components/home/home-featured-tools";
 import { HomeRequestCta } from "@/components/home/home-request-cta";
 import { NewsletterForm } from "@/components/home/newsletter-form";
-import { getFeaturedTools } from "@/lib/airtable-helpers";
+import { MostViewedToolsSection } from "@/components/home/most-viewed-tools-section";
+import { getFeaturedTools, getMostViewedTools } from "@/lib/airtable-helpers";
 import { featuredTools as mockFeaturedTools } from "@/lib/mock-data";
 
 export default async function Home() {
@@ -24,12 +25,22 @@ export default async function Home() {
     featuredTools = mockFeaturedTools;
   }
 
+  // Fetch most viewed tools for social proof (fails silently if no views yet)
+  let mostViewedTools;
+  try {
+    mostViewedTools = await getMostViewedTools(6);
+  } catch (error) {
+    console.error("Failed to load most viewed tools:", error);
+    mostViewedTools = [];
+  }
+
   return (
     <Container>
       <HomeHero />
       <HomeValueProps />
       <HomeCategoriesPreview />
       <HomeFeaturedTools tools={featuredTools} />
+      <MostViewedToolsSection tools={mostViewedTools} />
       <HomeRequestCta />
       <NewsletterForm />
     </Container>

@@ -81,6 +81,9 @@ export interface Tool {
   otherIntegrations?: string;
   demoVideoUrl?: string;
   primaryCompetitorIds?: string[];
+
+  // Analytics
+  page_views?: number;
 }
 
 /**
@@ -192,6 +195,9 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     otherIntegrations: airtableTool.otherIntegrations,
     demoVideoUrl: airtableTool.demoVideoUrl,
     primaryCompetitorIds: airtableTool.primaryCompetitorIds,
+
+    // Analytics
+    page_views: airtableTool.page_views,
   };
 }
 
@@ -914,4 +920,24 @@ export async function getToolsByFilters(filters: {
   }
 
   return tools;
+}
+
+/**
+ * Get most viewed tools for social proof
+ * Returns tools sorted by page_views (highest first)
+ *
+ * @param limit - Maximum number of tools to return (default: 6)
+ * @returns Array of most viewed Tool objects
+ */
+export async function getMostViewedTools(limit = 6): Promise<Tool[]> {
+  const allTools = await getAllTools();
+
+  // Filter tools that have view counts
+  const toolsWithViews = allTools.filter(tool => tool.page_views && tool.page_views > 0);
+
+  // Sort by page_views descending
+  const sorted = toolsWithViews.sort((a, b) => (b.page_views || 0) - (a.page_views || 0));
+
+  // Return top N tools
+  return sorted.slice(0, limit);
 }

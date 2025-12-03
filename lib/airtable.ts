@@ -356,14 +356,14 @@ interface AirtableQueryParams {
  * Generic fetch wrapper for Airtable API calls
  *
  * @param tableName - The name of the Airtable table to query
- * @param params - Optional query parameters
+ * @param paramsOrPath - Optional query parameters OR path segment (for specific records)
  * @param options - Optional fetch options (method, body, etc.)
  * @returns The parsed JSON response
  * @throws {AirtableError} If the request fails or returns a non-2xx status
  */
 async function airtableFetch<T = unknown>(
   tableName: string,
-  params?: AirtableQueryParams,
+  paramsOrPath?: AirtableQueryParams | string,
   options?: RequestInit
 ): Promise<T> {
   const DEBUG = process.env.DEBUG_AIRTABLE === 'true';
@@ -371,16 +371,22 @@ async function airtableFetch<T = unknown>(
   // Get credentials (validates environment variables)
   const { apiKey, baseId } = getAirtableCredentials();
 
+  // Determine if second param is a path (string) or params (object)
+  const isPath = typeof paramsOrPath === 'string';
+  const pathSegment = isPath ? paramsOrPath : '';
+  const params = isPath ? undefined : paramsOrPath;
+
   if (DEBUG) {
     console.log('\n[DEBUG] airtableFetch called');
     console.log('[DEBUG] Table:', tableName);
     console.log('[DEBUG] Base ID:', baseId);
     console.log('[DEBUG] API Key:', apiKey.substring(0, 10) + '...');
+    console.log('[DEBUG] Path segment:', pathSegment || 'none');
     console.log('[DEBUG] Params:', JSON.stringify(params, null, 2));
   }
 
   // Build URL with query parameters
-  const url = new URL(`${AIRTABLE_BASE_URL}/${baseId}/${tableName}`);
+  const url = new URL(`${AIRTABLE_BASE_URL}/${baseId}/${tableName}${pathSegment}`);
 
   if (params) {
     if (params.filterByFormula) {
@@ -872,6 +878,32 @@ export async function createRecord<T = unknown>(
     undefined,
     {
       method: 'POST',
+      body: JSON.stringify({ fields }),
+    }
+  );
+
+  return response;
+}
+
+/**
+ * Update an existing record in Airtable
+ *
+ * @param tableName - The name of the Airtable table
+ * @param recordId - The ID of the record to update
+ * @param fields - The fields to update
+ * @returns The updated record
+ * @throws {AirtableError} If the Airtable request fails
+ */
+export async function updateRecord<T = unknown>(
+  tableName: string,
+  recordId: string,
+  fields: Record<string, unknown>
+): Promise<AirtableRecord<T>> {
+  const response = await airtableFetch<AirtableRecord<T>>(
+    tableName,
+    `/${recordId}`,
+    {
+      method: 'PATCH',
       body: JSON.stringify({ fields }),
     }
   );

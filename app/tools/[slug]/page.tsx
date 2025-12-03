@@ -10,6 +10,7 @@ import { ToolIntegrationsSection } from "@/components/tools/tool-integrations-se
 import { ToolComplianceSection } from "@/components/tools/tool-compliance-section";
 import { ToolCaseStudySection } from "@/components/tools/tool-case-study-section";
 import { ToolAlternatives } from "@/components/tools/tool-alternatives";
+import { ToolViewTracker } from "@/components/tools/tool-view-tracker";
 import { Separator } from "@/components/ui/separator";
 import { Scale } from "lucide-react";
 
@@ -50,6 +51,9 @@ export default async function ToolDetailPage({ params, searchParams }: PageProps
 
   return (
     <Container className="py-12">
+      {/* Track page view */}
+      <ToolViewTracker toolId={tool.id} />
+
       {/* Show "Comparing with X" banner if came from competitor */}
       {referrerTool && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

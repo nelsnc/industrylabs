@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Building2, Shield, Link2, ArrowRight } from "lucide-react";
+import { Building2, Shield, Link2, ArrowRight, Eye } from "lucide-react";
 import { formatPricing } from "@/lib/utils/pricing-formatter";
 import type { Tool } from "@/lib/airtable-helpers";
 import { cn } from "@/lib/utils";
@@ -181,13 +181,21 @@ export function ToolCard({
         </div>
       </CardContent>
 
-      <CardFooter>
-        <Button asChild variant="outline" className="w-full group">
+      <CardFooter className="flex items-center justify-between gap-3">
+        <Button asChild variant="outline" className="flex-1 group">
           <Link href={detailUrl}>
             View Details
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>
+
+        {/* View count badge */}
+        {tool.page_views && tool.page_views > 0 && (
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <Eye className="w-3 h-3" />
+            <span>{tool.page_views.toLocaleString()}</span>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
