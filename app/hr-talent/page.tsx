@@ -8,7 +8,8 @@ import { MobileFilterSheet } from "@/components/filters/mobile-filter-sheet";
 import { CategoryNavigation } from "@/components/hr/category-navigation";
 import { CategorySection } from "@/components/hr/category-section";
 import { ToolSearchBar } from "@/components/tools/tool-search-bar";
-import { Suspense } from "react";
+import { RequestBoardCompactCTA } from "@/components/request/request-board-compact-cta";
+import { Suspense, Fragment } from "react";
 import { FilterSkeleton } from "@/components/filters/filter-skeleton";
 import { UserPlus, GraduationCap, Target, Heart, BarChart3 } from "lucide-react";
 import Link from "next/link";
@@ -269,18 +270,27 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
                     );
                   })()
                 ) : (
-                  categoryDefinitions.map((category) => {
+                  categoryDefinitions.map((category, index) => {
                     const categoryTools = getToolsForCategory(tools, category.slug);
                     return (
-                      <CategorySection
-                        key={category.id}
-                        id={category.slug}
-                        name={category.name}
-                        description={category.description}
-                        icon={category.icon}
-                        tools={categoryTools}
-                        showCount={8}
-                      />
+                      <Fragment key={category.id}>
+                        <CategorySection
+                          id={category.slug}
+                          name={category.name}
+                          description={category.description}
+                          icon={category.icon}
+                          tools={categoryTools}
+                          showCount={8}
+                        />
+                        {index === 1 && (
+                          <div className="my-12">
+                            <RequestBoardCompactCTA
+                              headline="Can't find the perfect HR tool?"
+                              subheadline="Tell us your HR needs and we'll match you with 2-3 tools that fit your budget, team size, and compliance requirements."
+                            />
+                          </div>
+                        )}
+                      </Fragment>
                     );
                   })
                 )}
