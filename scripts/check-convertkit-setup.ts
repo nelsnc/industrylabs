@@ -3,6 +3,8 @@
  * Run: npx tsx scripts/check-convertkit-setup.ts
  */
 
+export {};
+
 console.log("🔍 Checking ConvertKit Setup...\n");
 
 const apiSecret = process.env.CONVERTKIT_API_SECRET;

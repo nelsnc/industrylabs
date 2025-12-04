@@ -3,6 +3,8 @@
  * Run: npx tsx scripts/test-newsletter-api.ts
  */
 
+export {};
+
 const TEST_EMAIL = "test@example.com"; // Change this to your test email
 
 console.log("🧪 Testing Newsletter Subscription API\n");
