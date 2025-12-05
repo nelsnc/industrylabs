@@ -244,12 +244,13 @@ DEBUG_AIRTABLE=true                                 # Logs all Airtable requests
 - **Footer**: Site footer with links and legal
 - **Breadcrumbs**: Navigation breadcrumbs
 
-### Home Page Components (6)
+### Home Page Components (7)
 - **Hero**: Homepage hero section
 - **ValuePropSection**: Key benefits display
 - **FeaturedToolsSection**: Showcase top tools
+- **FeaturedArticlesSection**: Recent articles display
+- **EmailCaptureSection**: Newsletter signup (TASK-112)
 - **HomeRequestCta**: Enhanced CTA to Request Board (TASK-111)
-- **NewsletterForm**: Email capture with ConvertKit (TASK-112)
 - **MostViewedToolsSection**: Popular tools analytics (TASK-113)
 
 ### HR Category Components (2)
@@ -288,10 +289,11 @@ DEBUG_AIRTABLE=true                                 # Logs all Airtable requests
 - **ActiveFilters**: Display active filters with remove buttons (TASK-209)
 - **FilterSkeleton**: Loading state (TASK-209)
 
-### Request Board Components (3)
+### Request Board Components (4)
 - **RequestBoardForm**: Main form component (Foundation)
 - **RequestBoardCTA**: Full-width CTA section (TASK-111)
-- **RequestBoardCompactCTA**: Compact inline CTA (TASK-111)
+- **RequestBoardInlineCTA**: Compact sidebar CTA (TASK-111)
+- **RequestBoardStickyCTA**: Sticky sidebar CTA [if created] (TASK-111)
 
 ### Article Components (1)
 - **ArticleCard**: Article preview card (Foundation)
@@ -319,7 +321,7 @@ DEBUG_AIRTABLE=true                                 # Logs all Airtable requests
 
 ---
 
-### POST /api/subscribe (TASK-112)
+### POST /api/subscribe (NEW - TASK-112)
 **File:** `app/api/subscribe/route.ts`
 **Purpose:** Newsletter subscription via ConvertKit
 
@@ -328,48 +330,30 @@ DEBUG_AIRTABLE=true                                 # Logs all Airtable requests
 - ConvertKit API integration
 - Tags applied: "IndustryLabs Website", "Newsletter Signup"
 - Duplicate detection (already subscribed)
-- Graceful error handling
+- Optional: Writes to Airtable NOTIFY_LIST table
 
 **Request Body:** `{ email: string }`
 **Response:** `{ success: boolean, message: string, subscriberId?: string }`
 
-**Environment Variables Required:**
-- `CONVERTKIT_API_SECRET`
-- `CONVERTKIT_FORM_ID`
-
-**Implementation Notes:**
-- Server-side only (API key never exposed to client)
-- Returns user-friendly error messages
-- Handles ConvertKit API errors gracefully
-- 30-second timeout for API calls
+**Environment Variables:**
+- CONVERTKIT_API_SECRET (required)
+- CONVERTKIT_FORM_ID (required)
 
 ---
 
-### POST /api/tools/[toolId]/view (TASK-113)
+### POST /api/tools/[toolId]/view (NEW - TASK-113)
 **File:** `app/api/tools/[toolId]/view/route.ts`
 **Purpose:** Track tool page views for analytics
 
 **Features:**
-- Increments `page_views` field in Airtable
+- Increments page_views in Airtable
+- Updates last_view_date
 - Rate limiting: 1 count per IP per hour (in-memory cache)
 - Non-blocking: Failures don't crash page
 - Privacy-friendly: No cookies, no user tracking
-- Automatic cache cleanup every hour
 
-**Request:** Empty POST to `/api/tools/{toolId}/view`
+**Request:** Empty POST to /api/tools/{toolId}/view
 **Response:** `{ success: boolean, views?: number, message: string }`
-
-**Rate Limiting:**
-- Uses in-memory Map cache
-- Key: `${ip}-${toolId}`
-- Duration: 60 minutes
-- Automatic cleanup via setInterval
-
-**Implementation Notes:**
-- Validates toolId format (must start with "rec")
-- Gets IP from x-forwarded-for header
-- Falls back to "unknown" if IP unavailable
-- Returns 200 even when rate limited (silent)
 
 ---
 
@@ -556,19 +540,15 @@ Email subscribers for newsletters and product updates.
 - `getAllArticles()` - Fetch published articles
 - `getArticleBySlug(slug)` - Single article lookup
 
-**NEW v2.3 Functions (TASK-208):**
+**New v2.3 Functions (TASK-208):**
 - `getToolsByBudgetRange(min, max, vertical?)` - Filter by annual budget
 - `getToolsByCompanySize(size, vertical?)` - Filter by employee count
 - `getToolsByRegion(region, vertical?)` - Filter by supported regions
 - `getToolsByCompliance(needs[], vertical?)` - Filter by compliance requirements
+- `getToolsByIntegration(name, minQuality?, vertical?)` - Filter by integration
 - `getToolsByFilters(filters)` - Combined smart filtering
 - `getIntegrationsForTool(toolId)` - Fetch integration quality data
-- `getToolsUsingIntegration(integrationId)` - Reverse lookup
-- `getIntegrationQuality(toolId, integrationId)` - Specific quality rating
-- `createToolIntegration(data)` - Create new integration relationship
-
-**NEW Analytics Functions (TASK-113):**
-- `getMostViewedTools(limit)` - Fetch tools sorted by page_views
+- `getMostViewedTools(limit)` - Analytics (TASK-113)
 
 ---
 
@@ -651,9 +631,9 @@ const estimate = estimateTimelineForBuyer(
 ## 🎯 Key Features
 
 ### Content & Discovery
-✅ Homepage with hero, value props, featured tools, most viewed tools
-✅ HR & Talent category page with 5 sub-category sections (TASK-108)
-✅ Sub-categories: Recruiting & ATS, Onboarding, Performance Management, Employee Engagement, HR Analytics
+✅ Homepage with hero, value props, featured tools/articles
+✅ HR & Talent category page with sub-category organization (TASK-108)
+✅ 5 HR sub-categories: Recruiting, Onboarding, Performance, Engagement, Analytics
 ✅ Tool detail pages with rich v2.3 data display (TASK-210)
 ✅ Article detail pages with markdown rendering
 ✅ Tool search functionality with URL-driven state (TASK-110)
@@ -664,7 +644,7 @@ const estimate = estimateTimelineForBuyer(
 ✅ Budget range filter (min/max inputs with apply button)
 ✅ Region filter (6 options: UK, US, EU, Australia, Canada, Global)
 ✅ Compliance filter (GDPR, EEOC, SOC2, HIPAA, ISO27001)
-✅ Integration filter (30 canonical platforms grouped by category)
+✅ Integration filter (16 common platforms grouped by category)
 ✅ Active filters display with individual remove buttons
 ✅ Combined filtering with URL persistence
 ✅ Mobile-responsive (sidebar on desktop, sheet on mobile)
@@ -741,22 +721,21 @@ const estimate = estimateTimelineForBuyer(
 ## 📊 Codebase Statistics (Updated Dec 3, 2025)
 
 ### File Counts:
-- **Total Files:** ~130-150 (estimated)
-- **Components:** ~65-70
+- **Total Files:** ~120-140 (estimated)
+- **Components:** ~60-70
 - **Pages (routes):** ~10-12
-- **API Routes:** 3 (request, subscribe, view tracking)
-- **Utility Functions:** 2 libraries (pricing, timeline)
-- **Test Files:** 2 (pricing-formatter.test.ts, timeline-estimator.test.ts)
-- **Scripts:** 6 (Airtable testing, ConvertKit testing, view tracking)
+- **API Routes:** 3
+- **Utility Functions:** 2 libraries
+- **Test Files:** 2 (pricing, timeline)
 
 ### Lines of Code (estimated):
-- **Total:** ~16,000-19,000 lines
-- **Components:** ~9,000-11,000 lines
-- **Pages:** ~2,200-2,700 lines
-- **API Routes:** ~450-550 lines
-- **Utilities:** ~400-500 lines
-- **Tests:** ~500-600 lines
-- **Config/Setup:** ~600-700 lines
+- **Total:** ~15,000-18,000 lines
+- **Components:** ~8,000-10,000 lines
+- **Pages:** ~2,000-2,500 lines
+- **API Routes:** ~400-500 lines
+- **Utilities:** ~300-400 lines
+- **Tests:** ~400-500 lines
+- **Config/Setup:** ~500-600 lines
 
 ### Airtable Schema:
 - **Tables:** 12 (was 9)
@@ -765,9 +744,9 @@ const estimate = estimateTimelineForBuyer(
 - **Sample Records:** 30+ tools, 30 integrations
 
 ### Dependencies:
-- **Production:** ~27-32 packages
-- **Development:** ~17-22 packages
-- **Total:** ~44-54 packages
+- **Production:** ~25-30 packages
+- **Development:** ~15-20 packages
+- **Total:** ~40-50 packages
 
 ### Performance Metrics:
 - **Build Time:** ~2-3 minutes
@@ -812,7 +791,7 @@ const estimate = estimateTimelineForBuyer(
 - 8 tool detail sections
 - Comparison/alternatives system
 
-**Lines Added:** ~5,000-6,000
+**Lines Added:** ~4,000-5,000
 
 ---
 
@@ -830,7 +809,7 @@ const estimate = estimateTimelineForBuyer(
 - CategorySection (97 lines)
 - ToolSearchBar (80 lines)
 
-**Lines Added:** ~800-1,000
+**Lines Added:** ~700-900
 
 ---
 
@@ -855,7 +834,7 @@ const estimate = estimateTimelineForBuyer(
 - check-convertkit-setup.ts
 - test-newsletter-api.ts
 
-**Lines Added:** ~700-900
+**Lines Added:** ~600-800
 
 ---
 
@@ -885,17 +864,15 @@ const estimate = estimateTimelineForBuyer(
 **New Scripts:**
 - test-view-tracking.ts
 
-**Lines Added:** ~400-500
+**Lines Added:** ~300-400
 
 ---
 
 ### Total Transformation:
-- **Before (Nov 23):** ~8,000 lines, 30 components, 1 API route, 9 Airtable tables
-- **After (Dec 3):** ~16,000-19,000 lines, 65-70 components, 3 API routes, 12 Airtable tables
+- **Before:** ~8,000 lines, 30 components, 1 API route
+- **After:** ~15,000-18,000 lines, 60-70 components, 3 API routes
 - **Growth:** ~2x codebase size in 10 days
-- **New Features:** 60+ major additions
-- **New Fields:** +70 Airtable fields
-- **Test Coverage:** 2 utility libraries with 100% coverage
+- **New Features:** 50+ major additions
 
 ---
 
