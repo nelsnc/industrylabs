@@ -8,6 +8,7 @@ import { BudgetRangeFilter } from "./budget-range-filter";
 import { RegionFilter } from "./region-filter";
 import { ComplianceFilter } from "./compliance-filter";
 import { IntegrationFilter } from "./integration-filter";
+import { UseCaseFilter } from "./use-case-filter";
 
 export function ToolFilters() {
   const router = useRouter();
@@ -20,7 +21,8 @@ export function ToolFilters() {
     searchParams.has("budgetMax") ||
     searchParams.has("region") ||
     searchParams.has("compliance") ||
-    searchParams.has("integrations");
+    searchParams.has("integrations") ||
+    searchParams.has("useCases");
 
   const handleClearAll = () => {
     // Remove all filter params but preserve other params if any
@@ -31,6 +33,7 @@ export function ToolFilters() {
     params.delete("region");
     params.delete("compliance");
     params.delete("integrations");
+    params.delete("useCases");
 
     const queryString = params.toString();
     router.push(queryString ? `?${queryString}` : window.location.pathname);
@@ -47,6 +50,9 @@ export function ToolFilters() {
         )}
       </div>
 
+      <Separator />
+
+      <UseCaseFilter />
       <Separator />
 
       <CompanySizeFilter />

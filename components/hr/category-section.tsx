@@ -1,3 +1,8 @@
+// DEPRECATED: Removed in TASK-114 (converted categories to filters)
+// This component is no longer used after refactoring /hr-talent page to use filters instead of category sections.
+// Categories are now implemented as a "Use Case" filter in the sidebar.
+// Kept for reference only - can be deleted after verification.
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ToolGrid } from "@/components/tools/tool-grid";

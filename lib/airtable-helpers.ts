@@ -838,6 +838,15 @@ export async function getToolsByCompliance(
   });
 }
 
+// Use case keyword mapping for filtering
+const USE_CASE_KEYWORDS: Record<string, string[]> = {
+  recruiting: ['recruit', 'ats', 'hiring', 'applicant', 'candidate', 'sourcing'],
+  onboarding: ['onboard', 'training', 'learning', 'new hire', 'orientation'],
+  performance: ['performance', 'review', 'goal', 'okr', 'feedback', '360'],
+  engagement: ['engagement', 'culture', 'satisfaction', 'pulse', 'survey', 'sentiment'],
+  analytics: ['analytics', 'reporting', 'insights', 'data', 'dashboard', 'metrics'],
+};
+
 /**
  * Advanced filtering combining multiple criteria
  * Used for Request Board matching and smart filters UI
@@ -852,6 +861,7 @@ export async function getToolsByFilters(filters: {
   companySize?: number;
   region?: string;
   complianceNeeds?: string[];
+  useCases?: string[];
 }): Promise<Tool[]> {
   let tools = filters.vertical
     ? await getToolsByVertical(filters.vertical)
@@ -916,6 +926,18 @@ export async function getToolsByFilters(filters: {
           default:
             return false;
         }
+      });
+    });
+  }
+
+  // Apply use case filter
+  if (filters.useCases && filters.useCases.length > 0) {
+    tools = tools.filter((tool) => {
+      const searchText = `${tool.name} ${tool.shortDescription || ''} ${tool.fullDescription || ''}`.toLowerCase();
+
+      return filters.useCases!.some((useCase) => {
+        const keywords = USE_CASE_KEYWORDS[useCase] || [];
+        return keywords.some((keyword) => searchText.includes(keyword));
       });
     });
   }

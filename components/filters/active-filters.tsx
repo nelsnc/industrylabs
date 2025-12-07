@@ -4,6 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
+const USE_CASE_OPTIONS = [
+  { value: "recruiting", label: "Recruiting & ATS" },
+  { value: "onboarding", label: "Onboarding & Training" },
+  { value: "performance", label: "Performance Management" },
+  { value: "engagement", label: "Employee Engagement" },
+  { value: "analytics", label: "HR Analytics & Reporting" },
+];
+
 interface ActiveFilter {
   type: string;
   label: string;
@@ -73,6 +81,17 @@ export function ActiveFilters() {
       type: "integrations",
       label: integration,
       value: integration,
+    });
+  });
+
+  // Use Case filters
+  const useCases = searchParams.get("useCases")?.split(",") || [];
+  useCases.forEach((useCase) => {
+    const useCaseLabel = USE_CASE_OPTIONS.find((uc) => uc.value === useCase)?.label || useCase;
+    activeFilters.push({
+      type: "useCases",
+      label: useCaseLabel,
+      value: useCase,
     });
   });
 

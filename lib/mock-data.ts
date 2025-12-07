@@ -29,6 +29,60 @@ export type Tool = {
   integrationTags?: string[];
   websiteUrl?: string;
   detailedPricing?: string;
+
+  // GROUP 1: Company Size & Regional Fit (v2.3)
+  idealCompanySize?: string[];
+  companySizeNotes?: string;
+  supportedRegions?: string[];
+
+  // GROUP 2: Pricing Engine (v2.3)
+  pricingAnnualMin?: number;
+  pricingAnnualMax?: number;
+  pricingCurrency?: 'GBP' | 'USD' | 'EUR';
+  pricingNotes?: string;
+  pricingDisplay?: string;
+  pricingSourceUrl?: string;
+  setupFee?: number;
+  setupFeeIncluded?: boolean;
+  freeTrialAvailable?: boolean;
+  freeTrialDurationDays?: number;
+  contractLengthOptions?: string[];
+
+  // GROUP 3: Compliance & Certifications (v2.3)
+  gdprCompliant?: boolean;
+  eeocCompliant?: boolean;
+  soc2Certified?: boolean;
+  hipaaCompliant?: boolean;
+  iso27001Certified?: boolean;
+  complianceDocumentationUrl?: string;
+  complianceNotes?: string;
+
+  // GROUP 4: Implementation Timeline (v2.3)
+  implementationTimelineWeeksMin?: number;
+  implementationTimelineWeeksMax?: number;
+  implementationTimelineDisplay?: string;
+  itHoursRequired?: number;
+  hrAdminHoursRequired?: number;
+  trainingHoursAdmin?: number;
+  trainingHoursEnduser?: number;
+  implementationPrerequisites?: string;
+  commonImplementationDelays?: string;
+
+  // GROUP 5: Case Study & Social Proof (v2.3)
+  caseStudyUrl?: string;
+  caseStudyCompanySize?: number;
+  caseStudyIndustry?: string;
+  caseStudyImplementationWeeks?: number;
+  caseStudyResults?: string;
+  notableCustomers?: string;
+
+  // GROUP 6: Integrations & Rich Media (v2.3)
+  otherIntegrations?: string;
+  demoVideoUrl?: string;
+  primaryCompetitorIds?: string[];
+
+  // Analytics
+  page_views?: number;
 };
 
 export type Article = {
