@@ -169,11 +169,11 @@ function ContentSection({
         <div
           className={cn(
             "grid gap-6",
-            "grid-cols-1",
-            "md:grid-cols-2",
+            "grid-cols-1",           // Mobile: 1 column
+            "sm:grid-cols-2",        // Small tablet (640px+): 2 columns
             isSidebarOpen
-              ? "lg:grid-cols-2 xl:grid-cols-3"
-              : "lg:grid-cols-3 xl:grid-cols-4"
+              ? "lg:grid-cols-2 xl:grid-cols-3"  // Desktop with sidebar: 2-3 columns
+              : "lg:grid-cols-3 xl:grid-cols-4"  // Desktop no sidebar: 3-4 columns
           )}
         >
           {filteredTools.map((tool) => (
