@@ -1,3 +1,20 @@
+/**
+ * ToolSearchBar Component
+ *
+ * STATUS: Currently hidden from UI (TASK-116)
+ * REASON: Premature for MVP with only 4 tools - visual scanning is faster
+ * RE-ENABLE: When tool count reaches 25-30+
+ *
+ * This component is fully functional and tested.
+ * To re-enable:
+ *   1. Uncomment in app/hr-talent/page.tsx (search param parsing)
+ *   2. Add <ToolSearchBar /> to components/hr/hr-talent-client.tsx
+ *   3. Uncomment search filtering logic in page.tsx
+ *
+ * Last used: Pre-TASK-116
+ * Hidden: 2025-12-07 (TASK-116)
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

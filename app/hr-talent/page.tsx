@@ -13,7 +13,7 @@ interface PageProps {
     compliance?: string;
     integrations?: string;
     useCases?: string;
-    search?: string;
+    // search?: string; // TASK-116: Hidden for MVP (only 4 tools)
   }>;
 }
 
@@ -36,7 +36,8 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
   const complianceNeeds = params.compliance?.split(",").filter(Boolean) || undefined;
   const requiredIntegrations = params.integrations?.split(",").filter(Boolean) || undefined;
   const useCases = params.useCases?.split(",").filter(Boolean) || undefined;
-  const searchQuery = params.search?.toLowerCase().trim();
+  // TASK-116: Search hidden for MVP (only 4 tools - visual scanning faster)
+  // const searchQuery = params.search?.toLowerCase().trim();
 
   let filteredTools;
   try {
@@ -86,14 +87,16 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
       });
     }
 
-    if (searchQuery) {
-      filteredTools = filteredTools.filter(
-        (tool) =>
-          tool.name.toLowerCase().includes(searchQuery) ||
-          tool.shortDescription?.toLowerCase().includes(searchQuery) ||
-          tool.fullDescription?.toLowerCase().includes(searchQuery)
-      );
-    }
+    // TASK-116: Search filtering hidden for MVP
+    // TODO: Re-enable when tool count reaches 25+
+    // if (searchQuery) {
+    //   filteredTools = filteredTools.filter(
+    //     (tool) =>
+    //       tool.name.toLowerCase().includes(searchQuery) ||
+    //       tool.shortDescription?.toLowerCase().includes(searchQuery) ||
+    //       tool.fullDescription?.toLowerCase().includes(searchQuery)
+    //   );
+    // }
   } catch (error) {
     console.error("Failed to load HR tools from Airtable:", error);
     filteredTools = mockHrTools;
@@ -107,8 +110,8 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
     regions !== undefined ||
     complianceNeeds !== undefined ||
     requiredIntegrations !== undefined ||
-    useCases !== undefined ||
-    !!searchQuery;
+    useCases !== undefined;
+    // || !!searchQuery; // TASK-116: Search hidden for MVP
 
   return (
     <Container className="py-12 md:py-16">
