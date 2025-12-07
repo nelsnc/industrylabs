@@ -9,8 +9,18 @@ import { RegionFilter } from "./region-filter";
 import { ComplianceFilter } from "./compliance-filter";
 import { IntegrationFilter } from "./integration-filter";
 import { UseCaseFilter } from "./use-case-filter";
+import { FilterToggleButton } from "./filter-toggle-button";
+import { cn } from "@/lib/utils";
 
-export function ToolFilters() {
+interface ToolFiltersProps {
+  isOpen?: boolean;
+  onToggle?: () => void;
+}
+
+export function ToolFilters({
+  isOpen = true,
+  onToggle,
+}: ToolFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,6 +33,9 @@ export function ToolFilters() {
     searchParams.has("compliance") ||
     searchParams.has("integrations") ||
     searchParams.has("useCases");
+
+  // Count active filters for badge
+  const activeFilterCount = getActiveFilterCount(searchParams);
 
   const handleClearAll = () => {
     // Remove all filter params but preserve other params if any
@@ -40,34 +53,82 @@ export function ToolFilters() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-        {hasActiveFilters && (
-          <Button onClick={handleClearAll} variant="ghost" size="sm">
-            Clear all
-          </Button>
-        )}
+    <div className={cn(
+      "relative transition-all duration-300 ease-in-out",
+      isOpen ? "w-[280px]" : "w-0"
+    )}>
+      {/* Toggle Button */}
+      {onToggle && isOpen && (
+        <div className="mb-4">
+          <FilterToggleButton
+            isOpen={isOpen}
+            onToggle={onToggle}
+            activeFilterCount={activeFilterCount}
+          />
+        </div>
+      )}
+
+      {/* Filter Content */}
+      <div className={cn(
+        "overflow-hidden transition-all duration-300",
+        !isOpen && "opacity-0 invisible"
+      )}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            {hasActiveFilters && (
+              <Button onClick={handleClearAll} variant="ghost" size="sm">
+                Clear all
+              </Button>
+            )}
+          </div>
+
+          <Separator />
+
+          <UseCaseFilter />
+          <Separator />
+
+          <CompanySizeFilter />
+          <Separator />
+
+          <BudgetRangeFilter />
+          <Separator />
+
+          <RegionFilter />
+          <Separator />
+
+          <ComplianceFilter />
+          <Separator />
+
+          <IntegrationFilter />
+        </div>
       </div>
-
-      <Separator />
-
-      <UseCaseFilter />
-      <Separator />
-
-      <CompanySizeFilter />
-      <Separator />
-
-      <BudgetRangeFilter />
-      <Separator />
-
-      <RegionFilter />
-      <Separator />
-
-      <ComplianceFilter />
-      <Separator />
-
-      <IntegrationFilter />
     </div>
   );
+}
+
+// Helper function to count active filters
+function getActiveFilterCount(searchParams: URLSearchParams): number {
+  let count = 0;
+
+  const sizes = searchParams.get("size")?.split(",") || [];
+  count += sizes.length;
+
+  if (searchParams.has("budgetMin") || searchParams.has("budgetMax")) {
+    count += 1;
+  }
+
+  const regions = searchParams.get("region")?.split(",") || [];
+  count += regions.length;
+
+  const compliance = searchParams.get("compliance")?.split(",") || [];
+  count += compliance.length;
+
+  const integrations = searchParams.get("integrations")?.split(",") || [];
+  count += integrations.length;
+
+  const useCases = searchParams.get("useCases")?.split(",") || [];
+  count += useCases.length;
+
+  return count;
 }

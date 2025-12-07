@@ -1,17 +1,8 @@
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ToolCard } from "@/components/tools/tool-card";
-import { getToolsByFilters, getAllTools } from "@/lib/airtable-helpers";
+import { getToolsByFilters } from "@/lib/airtable-helpers";
 import { hrTools as mockHrTools } from "@/lib/mock-data";
-import { ToolFilters } from "@/components/filters/tool-filters";
-import { ActiveFilters } from "@/components/filters/active-filters";
-import { MobileFilterSheet } from "@/components/filters/mobile-filter-sheet";
-import { RequestBoardCompactCTA } from "@/components/request/request-board-compact-cta";
-import { Suspense } from "react";
-import { FilterSkeleton } from "@/components/filters/filter-skeleton";
-import { AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { HRTalentClient } from "@/components/hr/hr-talent-client";
 
 interface PageProps {
   searchParams: Promise<{
@@ -136,71 +127,11 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
         </p>
       </div>
 
-      {/* Main Layout: Sidebar + Content */}
-      <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
-        {/* Filters Sidebar */}
-        <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
-          <Suspense fallback={<FilterSkeleton />}>
-            <ToolFilters />
-          </Suspense>
-        </aside>
-
-        {/* Main Content */}
-        <main className="space-y-6">
-          {/* Active Filters */}
-          <Suspense fallback={null}>
-            {hasActiveFilters && (
-              <div className="mb-4">
-                <ActiveFilters />
-              </div>
-            )}
-          </Suspense>
-
-          {/* Results Count and Mobile Filter */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {filteredTools.length}{" "}
-              {filteredTools.length === 1 ? "tool" : "tools"} found
-            </p>
-            <Suspense fallback={null}>
-              <MobileFilterSheet />
-            </Suspense>
-          </div>
-
-          {/* Tools Grid or No Results */}
-          {filteredTools.length === 0 ? (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                No tools match your current filters. Try adjusting your criteria or{" "}
-                <Link
-                  href="/hr-talent"
-                  className="font-medium text-blue-600 hover:underline"
-                >
-                  clear all filters
-                </Link>
-                .
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredTools.map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} />
-                ))}
-              </div>
-
-              {/* Request Board CTA */}
-              <div className="mt-12">
-                <RequestBoardCompactCTA
-                  headline="Can't find the perfect HR tool?"
-                  subheadline="Tell us your HR needs and we'll match you with 2-3 tools that fit your budget, team size, and compliance requirements."
-                />
-              </div>
-            </>
-          )}
-        </main>
-      </div>
+      {/* Client Component with Interactive UI */}
+      <HRTalentClient
+        filteredTools={filteredTools}
+        hasActiveFilters={hasActiveFilters}
+      />
     </Container>
   );
 }
