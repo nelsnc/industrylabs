@@ -11,15 +11,18 @@ import { IntegrationFilter } from "./integration-filter";
 import { UseCaseFilter } from "./use-case-filter";
 import { FilterToggleButton } from "./filter-toggle-button";
 import { cn } from "@/lib/utils";
+import type { IntegrationOption } from "@/lib/airtable-helpers";
 
 interface ToolFiltersProps {
   isOpen?: boolean;
   onToggle?: () => void;
+  availableIntegrations: IntegrationOption[];
 }
 
 export function ToolFilters({
   isOpen = true,
   onToggle,
+  availableIntegrations,
 }: ToolFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -100,7 +103,7 @@ export function ToolFilters({
           <ComplianceFilter />
           <Separator />
 
-          <IntegrationFilter />
+          <IntegrationFilter availableIntegrations={availableIntegrations} />
         </div>
       </div>
     </div>

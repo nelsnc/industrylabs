@@ -12,8 +12,22 @@ import {
 } from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
 import { ToolFilters } from "./tool-filters";
+import type { IntegrationOption } from "@/lib/airtable-helpers";
 
-export function MobileFilterSheet() {
+/**
+ * NOTE: This component is currently unused.
+ * Mobile filtering is handled by HRTalentClient with Sheet component.
+ * This file is kept for potential future use.
+ * Updated for TASK-118 dynamic integration filter compatibility.
+ */
+
+interface MobileFilterSheetProps {
+  availableIntegrations?: IntegrationOption[];
+}
+
+export function MobileFilterSheet({
+  availableIntegrations = [],
+}: MobileFilterSheetProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,7 +46,7 @@ export function MobileFilterSheet() {
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6">
-          <ToolFilters />
+          <ToolFilters availableIntegrations={availableIntegrations} />
         </div>
       </SheetContent>
     </Sheet>

@@ -1,6 +1,6 @@
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
-import { getToolsByFilters } from "@/lib/airtable-helpers";
+import { getToolsByFilters, getAvailableIntegrations, type IntegrationOption } from "@/lib/airtable-helpers";
 import { hrTools as mockHrTools } from "@/lib/mock-data";
 import { HRTalentClient } from "@/components/hr/hr-talent-client";
 
@@ -102,6 +102,15 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
     filteredTools = mockHrTools;
   }
 
+  // Get available integrations for dynamic filter (TASK-118)
+  let availableIntegrations: IntegrationOption[] = [];
+  try {
+    availableIntegrations = await getAvailableIntegrations(filteredTools);
+  } catch (error) {
+    console.error("Failed to compute available integrations:", error);
+    availableIntegrations = [];
+  }
+
   // Check if any filters are active
   const hasActiveFilters =
     companySizes !== undefined ||
@@ -134,6 +143,7 @@ export default async function HrTalentPage({ searchParams }: PageProps) {
       <HRTalentClient
         filteredTools={filteredTools}
         hasActiveFilters={hasActiveFilters}
+        availableIntegrations={availableIntegrations}
       />
     </Container>
   );

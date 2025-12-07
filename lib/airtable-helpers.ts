@@ -964,3 +964,152 @@ export async function getMostViewedTools(limit = 6): Promise<Tool[]> {
   // Return top N tools
   return sorted.slice(0, limit);
 }
+
+// ============================================================================
+// Dynamic Integration Filter Functions (TASK-118)
+// ============================================================================
+
+/**
+ * Integration category mapping
+ */
+const INTEGRATION_CATEGORIES: Record<string, string> = {
+  // HRIS & Payroll
+  'BambooHR': 'HRIS & Payroll',
+  'Workday': 'HRIS & Payroll',
+  'ADP': 'HRIS & Payroll',
+  'Gusto': 'HRIS & Payroll',
+  'Rippling': 'HRIS & Payroll',
+  'Personio': 'HRIS & Payroll',
+  'Hibob': 'HRIS & Payroll',
+  'Namely': 'HRIS & Payroll',
+  'Paychex': 'HRIS & Payroll',
+  'Justworks': 'HRIS & Payroll',
+  'Zenefits': 'HRIS & Payroll',
+
+  // ATS
+  'Greenhouse': 'ATS',
+  'Lever': 'ATS',
+  'Ashby': 'ATS',
+  'SmartRecruiters': 'ATS',
+  'Workable': 'ATS',
+  'JazzHR': 'ATS',
+  'Breezy HR': 'ATS',
+  'Recruitee': 'ATS',
+  'iCIMS': 'ATS',
+  'Jobvite': 'ATS',
+
+  // Communication
+  'Slack': 'Communication',
+  'Microsoft Teams': 'Communication',
+  'Google Workspace': 'Communication',
+  'Google Chat': 'Communication',
+  'Zoom': 'Communication',
+  'Google Meet': 'Communication',
+
+  // Calendar
+  'Google Calendar': 'Calendar',
+  'Outlook Calendar': 'Calendar',
+  'Office 365': 'Calendar',
+  'Apple Calendar': 'Calendar',
+
+  // Job Boards
+  'LinkedIn Recruiter': 'Job Boards',
+  'Indeed': 'Job Boards',
+  'Glassdoor': 'Job Boards',
+
+  // Other
+  'Asana': 'Other',
+  'Jira': 'Other',
+  'Monday.com': 'Other',
+  'Trello': 'Other',
+  'Salesforce': 'Other',
+  'HubSpot': 'Other',
+  'Zendesk': 'Other',
+  'Intercom': 'Other',
+  'Zapier': 'Other',
+};
+
+/**
+ * Get category for an integration
+ */
+function getIntegrationCategory(name: string): string {
+  return INTEGRATION_CATEGORIES[name] || 'Other';
+}
+
+/**
+ * Integration option with metadata
+ */
+export interface IntegrationOption {
+  name: string;
+  count: number; // Number of tools with this integration
+  category: string; // HRIS, Communication, etc.
+}
+
+/**
+ * Get available integrations from tools data (dynamic, not hardcoded)
+ * Only returns integrations that exist in at least one tool
+ */
+export async function getAvailableIntegrations(
+  tools?: Tool[]
+): Promise<IntegrationOption[]> {
+  // Use provided tools or fetch all
+  const allTools = tools || await getAllTools();
+
+  // Map to track integration names and their counts
+  const integrationMap = new Map<string, number>();
+
+  // Scan all tools for integrations
+  allTools.forEach((tool) => {
+    // Check other_integrations text field (comma-separated integrations)
+    if (tool.otherIntegrations) {
+      // Parse comma-separated list
+      const otherInts = tool.otherIntegrations
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      otherInts.forEach((name) => {
+        const current = integrationMap.get(name) || 0;
+        integrationMap.set(name, current + 1);
+      });
+    }
+  });
+
+  // Convert map to array of options
+  const options: IntegrationOption[] = Array.from(integrationMap.entries()).map(
+    ([name, count]) => ({
+      name,
+      count,
+      category: getIntegrationCategory(name),
+    })
+  );
+
+  // Sort by count (descending), then alphabetically
+  options.sort((a, b) => {
+    if (b.count !== a.count) {
+      return b.count - a.count; // Higher count first
+    }
+    return a.name.localeCompare(b.name); // Alphabetical
+  });
+
+  return options;
+}
+
+/**
+ * Group integrations by category
+ */
+export function groupIntegrationsByCategory(
+  integrations: IntegrationOption[]
+): Record<string, IntegrationOption[]> {
+  const grouped: Record<string, IntegrationOption[]> = {};
+
+  integrations.forEach((integration) => {
+    const category = integration.category;
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    grouped[category].push(integration);
+  });
+
+  return grouped;
+}

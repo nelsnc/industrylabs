@@ -17,16 +17,18 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import type { Tool } from "@/lib/airtable-helpers";
+import type { Tool, IntegrationOption } from "@/lib/airtable-helpers";
 
 interface HRTalentClientProps {
   filteredTools: Tool[];
   hasActiveFilters: boolean;
+  availableIntegrations: IntegrationOption[];
 }
 
 export function HRTalentClient({
   filteredTools,
   hasActiveFilters,
+  availableIntegrations,
 }: HRTalentClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
@@ -57,6 +59,7 @@ export function HRTalentClient({
             <ToolFilters
               isOpen={isSidebarOpen}
               onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+              availableIntegrations={availableIntegrations}
             />
           </aside>
 
@@ -99,6 +102,7 @@ export function HRTalentClient({
                   <ToolFilters
                     isOpen={true}
                     onToggle={() => setIsMobileSheetOpen(false)}
+                    availableIntegrations={availableIntegrations}
                   />
                 </div>
               </SheetContent>
