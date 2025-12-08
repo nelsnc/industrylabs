@@ -1,15 +1,15 @@
 /**
- * Tool Card Component v3.0
+ * Tool Card Component v3.1
  *
  * Design Philosophy:
- * - Minimal visual styling (no colored pills or emoji icons)
+ * - Subtle bordered tags for visual grouping
  * - Clear typography hierarchy
  * - Single blue accent color
  * - Professional B2B aesthetic
- * - Clean whitespace and simple text
+ * - Clean whitespace with structured tags
  * - Fast scanning (<3 seconds)
  *
- * Based on user feedback: "Too busy, too many fancy stuffs"
+ * v3.1 Updates: Added bordered tags to address "too dry" feedback
  */
 
 import Link from 'next/link';
@@ -66,11 +66,6 @@ export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
   // Get category label
   const categoryLabel = getCategoryLabel(tool.tags, tool.category);
 
-  // Build metadata line with bullet separators
-  const metadataItems = [pricing, companySize];
-  if (trial) metadataItems.push(trial);
-  const metadataLine = metadataItems.join('  •  ');
-
   return (
     <div className="group relative flex flex-col rounded-lg border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-md">
       {/* HEADER: Logo + Name + Category + Premium Badge */}
@@ -106,27 +101,49 @@ export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
 
         {/* Premium Badge - Subtle text, top right */}
         {isPremium && (
-          <span className="shrink-0 text-xs uppercase text-gray-500">
-            Premium
+          <span className="shrink-0 text-xs uppercase tracking-wider text-gray-400">
+            PREMIUM
           </span>
         )}
       </div>
 
-      {/* DESCRIPTION */}
-      <p className="mb-4 text-base leading-relaxed text-gray-600 line-clamp-2">
+      {/* DESCRIPTION (3 lines for more content) */}
+      <p className="mb-4 text-sm leading-relaxed text-gray-600 line-clamp-3">
         {tool.shortDescription || 'AI-powered HR solution for modern teams'}
       </p>
 
-      {/* METADATA LINE (pricing, size, trial) */}
-      <p className="mb-3 text-sm text-gray-500">
-        {metadataLine}
-      </p>
+      {/* METADATA TAGS (pricing, size, trial) */}
+      <div className="mb-3 flex flex-wrap gap-2">
+        {/* Pricing tag */}
+        <span className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700">
+          {pricing}
+        </span>
 
-      {/* COMPLIANCE (if any) */}
+        {/* Company size tag */}
+        <span className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700">
+          {companySize}
+        </span>
+
+        {/* Trial tag (if available) */}
+        {trial && (
+          <span className="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700">
+            {trial}
+          </span>
+        )}
+      </div>
+
+      {/* COMPLIANCE BADGES (if any) */}
       {complianceList.length > 0 && (
-        <p className="mb-4 text-xs uppercase tracking-wide text-gray-400">
-          {complianceList.join('  •  ')}
-        </p>
+        <div className="mb-4 flex flex-wrap gap-2">
+          {complianceList.map((item, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs uppercase tracking-wide text-gray-600"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
       )}
 
       {/* CTA - Right-aligned */}
