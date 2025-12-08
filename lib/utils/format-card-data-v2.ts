@@ -1,215 +1,109 @@
 /**
- * Card Data Formatting Utilities v2.0
+ * Card Data Formatting Utilities v3.0
  *
- * Purpose: Format tool data for horizontal pill-based card layout
- * Optimized for: B2B buyer scanning, <3 second comprehension
+ * Purpose: Format tool data as plain text for simplified card layout
+ * Optimized for: Professional B2B aesthetic, minimal visual styling
  *
- * Changes from v1:
- * - Horizontal pill format (not vertical list)
- * - Shorter text (scannable)
- * - Separate compliance icons from marketing badges
- * - Remove view count formatting
+ * Changes from v2.0:
+ * - Plain text formatters (no pill objects)
+ * - No emoji icons
+ * - Simple string returns
+ * - Clean typography focus
  */
-
-export interface CardPill {
-  text: string;
-  icon?: string;
-  variant: 'gray' | 'blue' | 'green' | 'amber';
-}
 
 /**
- * Format pricing for horizontal pill display
- * Examples:
- * - "£5K-25K/yr"
- * - "£15K+/yr"
- * - "Contact"
+ * Format pricing as plain text for metadata line
+ * Example: "£5K-25K/year"
  */
-export function formatCardPricingPill(
+export function formatPricingText(
   pricingMin?: number,
   pricingMax?: number,
   currency: string = 'GBP'
-): CardPill {
+): string {
   const symbol = currency === 'GBP' ? '£' : currency === 'USD' ? '$' : '€';
 
   if (!pricingMin && !pricingMax) {
-    return {
-      text: 'Contact for pricing',
-      icon: '💰',
-      variant: 'gray'
-    };
+    return 'Contact for pricing';
   }
 
   const formatK = (num: number) => {
-    if (num >= 1000) {
-      return `${Math.round(num / 1000)}K`;
-    }
+    if (num >= 1000) return `${Math.round(num / 1000)}K`;
     return num.toString();
   };
 
   if (pricingMin && pricingMax) {
-    return {
-      text: `${symbol}${formatK(pricingMin)}-${formatK(pricingMax)}/yr`,
-      icon: '💰',
-      variant: 'gray'
-    };
+    return `${symbol}${formatK(pricingMin)}-${formatK(pricingMax)}/year`;
   }
 
   if (pricingMin) {
-    return {
-      text: `${symbol}${formatK(pricingMin)}+/yr`,
-      icon: '💰',
-      variant: 'gray'
-    };
+    return `${symbol}${formatK(pricingMin)}+/year`;
   }
 
-  return {
-    text: `Up to ${symbol}${formatK(pricingMax!)}/yr`,
-    icon: '💰',
-    variant: 'gray'
-  };
+  return `Up to ${symbol}${formatK(pricingMax!)}/year`;
 }
 
 /**
- * Format company size for horizontal pill display
- * Examples:
- * - "1-50 employees"
- * - "51-500 employees"
- * - "500+ employees"
+ * Format company size as plain text
+ * Example: "1-200 employees"
  */
-export function formatCardCompanySizePill(
-  companySizeFit?: string[]
-): CardPill {
+export function formatCompanySizeText(companySizeFit?: string[]): string {
   if (!companySizeFit || companySizeFit.length === 0) {
-    return {
-      text: 'All company sizes',
-      icon: '👥',
-      variant: 'blue'
-    };
+    return 'All company sizes';
   }
 
-  // Parse size ranges
   const ranges = companySizeFit.map(size => {
     if (size === '500+') return { min: 500, max: Infinity };
     const [min, max] = size.split('-').map(s => parseInt(s.replace('+', '')));
     return { min, max: max || min };
   });
 
-  // Find overall min and max
   const overallMin = Math.min(...ranges.map(r => r.min));
   const overallMax = Math.max(...ranges.map(r => r.max));
 
   if (overallMax === Infinity) {
-    return {
-      text: `${overallMin}+ employees`,
-      icon: '👥',
-      variant: 'blue'
-    };
+    return `${overallMin}+ employees`;
   }
 
   if (overallMin === overallMax) {
-    return {
-      text: `~${overallMin} employees`,
-      icon: '👥',
-      variant: 'blue'
-    };
+    return `~${overallMin} employees`;
   }
 
-  return {
-    text: `${overallMin}-${overallMax} employees`,
-    icon: '👥',
-    variant: 'blue'
-  };
+  return `${overallMin}-${overallMax} employees`;
 }
 
 /**
- * Format free trial for horizontal pill display
- * Examples:
- * - "14-day trial"
- * - "7-day trial"
- * - null (if no trial)
+ * Format free trial as plain text
+ * Example: "7-day trial"
  */
-export function formatCardFreeTrialPill(
+export function formatFreeTrialText(
   hasFreeTrial?: boolean,
   trialDays?: number
-): CardPill | null {
+): string | null {
   if (!hasFreeTrial) return null;
-
-  const days = trialDays || 14; // Default to 14 if not specified
-
-  return {
-    text: `${days}-day trial`,
-    icon: '✓',
-    variant: 'green'
-  };
+  const days = trialDays || 14;
+  return `${days}-day trial`;
 }
 
 /**
- * Get compliance icons for display
- * Returns array of { name, icon, color } objects
- * Max 3 displayed, rest shown as "+N"
+ * Get compliance list as plain text array
+ * Example: ["GDPR", "EEOC", "SOC2"]
  */
-export interface ComplianceIcon {
-  name: string;
-  icon: string;
-  color: string;
-  tooltip: string;
-}
-
-export function getComplianceIcons(
+export function getComplianceList(
   gdprCompliant?: boolean,
   eeocCompliant?: boolean,
   soc2Certified?: boolean,
   hipaaCompliant?: boolean,
   iso27001Certified?: boolean
-): ComplianceIcon[] {
-  const icons: ComplianceIcon[] = [];
+): string[] {
+  const list: string[] = [];
 
-  if (gdprCompliant) {
-    icons.push({
-      name: 'GDPR',
-      icon: '🛡️',
-      color: 'text-emerald-600',
-      tooltip: 'GDPR Compliant (vendor-supplied)'
-    });
-  }
+  if (gdprCompliant) list.push('GDPR');
+  if (eeocCompliant) list.push('EEOC');
+  if (soc2Certified) list.push('SOC2');
+  if (hipaaCompliant) list.push('HIPAA');
+  if (iso27001Certified) list.push('ISO27001');
 
-  if (eeocCompliant) {
-    icons.push({
-      name: 'EEOC',
-      icon: '🛡️',
-      color: 'text-blue-600',
-      tooltip: 'EEOC Compliant (vendor-supplied)'
-    });
-  }
-
-  if (soc2Certified) {
-    icons.push({
-      name: 'SOC2',
-      icon: '🔒',
-      color: 'text-purple-600',
-      tooltip: 'SOC 2 Type II Certified'
-    });
-  }
-
-  if (hipaaCompliant) {
-    icons.push({
-      name: 'HIPAA',
-      icon: '🏥',
-      color: 'text-red-600',
-      tooltip: 'HIPAA Compliant'
-    });
-  }
-
-  if (iso27001Certified) {
-    icons.push({
-      name: 'ISO27001',
-      icon: '🌐',
-      color: 'text-indigo-600',
-      tooltip: 'ISO 27001 Certified'
-    });
-  }
-
-  return icons;
+  return list;
 }
 
 /**
@@ -239,17 +133,4 @@ export function getCategoryLabel(
   // Use first use case
   const firstUseCase = useCases[0].toLowerCase();
   return labelMap[firstUseCase] || useCases[0];
-}
-
-/**
- * Rewrite descriptions to be benefit-first
- * This is a mapping function - actual rewrites done separately
- */
-export function getBenefitDescription(
-  toolName: string,
-  originalDescription?: string
-): string {
-  // For now, return original
-  // TODO: Replace with benefit-first copy per tool
-  return originalDescription || 'AI-powered HR solution';
 }

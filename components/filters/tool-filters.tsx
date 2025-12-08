@@ -60,17 +60,6 @@ export function ToolFilters({
       "relative transition-all duration-300 ease-in-out",
       isOpen ? "w-[280px]" : "w-0"
     )}>
-      {/* Toggle Button */}
-      {onToggle && isOpen && (
-        <div className="mb-4">
-          <FilterToggleButton
-            isOpen={isOpen}
-            onToggle={onToggle}
-            activeFilterCount={activeFilterCount}
-          />
-        </div>
-      )}
-
       {/* Filter Content */}
       <div className={cn(
         "overflow-hidden transition-all duration-300",
@@ -79,11 +68,19 @@ export function ToolFilters({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-            {hasActiveFilters && (
-              <Button onClick={handleClearAll} variant="ghost" size="sm">
-                Clear all
-              </Button>
-            )}
+            <div className="flex items-center gap-3">
+              {hasActiveFilters && (
+                <Button onClick={handleClearAll} variant="ghost" size="sm">
+                  Clear all
+                </Button>
+              )}
+              {onToggle && (
+                <FilterToggleButton
+                  isOpen={isOpen}
+                  onToggle={onToggle}
+                />
+              )}
+            </div>
           </div>
 
           <Separator />

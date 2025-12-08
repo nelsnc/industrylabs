@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FilterToggleButtonProps {
   isOpen: boolean;
@@ -14,36 +12,20 @@ interface FilterToggleButtonProps {
 export function FilterToggleButton({
   isOpen,
   onToggle,
-  activeFilterCount = 0,
-  className,
+  className = ''
 }: FilterToggleButtonProps) {
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
       onClick={onToggle}
-      className={cn(
-        "w-full justify-start gap-2 text-sm font-medium",
-        className
-      )}
-      aria-label={isOpen ? "Close filters" : "Open filters"}
+      className={`flex items-center gap-1 text-sm text-gray-600 transition-colors hover:text-blue-600 ${className}`}
+      aria-label={isOpen ? 'Hide filters' : 'Show filters'}
     >
+      {isOpen ? 'Hide' : 'Show'}
       {isOpen ? (
-        <>
-          <PanelLeftClose className="h-4 w-4" />
-          <span>Hide Filters</span>
-        </>
+        <ChevronLeft className="h-4 w-4" />
       ) : (
-        <>
-          <PanelLeftOpen className="h-4 w-4" />
-          <span>Show Filters</span>
-          {activeFilterCount > 0 && (
-            <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-              {activeFilterCount}
-            </span>
-          )}
-        </>
+        <ChevronRight className="h-4 w-4" />
       )}
-    </Button>
+    </button>
   );
 }

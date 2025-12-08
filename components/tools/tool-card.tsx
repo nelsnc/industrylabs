@@ -1,36 +1,32 @@
 /**
- * Tool Card Component v2.0
+ * Tool Card Component v3.0
  *
  * Design Philosophy:
- * - Logo-left horizontal layout (not centered banner)
- * - Horizontal pill-based metadata (scannable left-to-right)
- * - Benefit-first description (outcome-driven)
- * - Icon-based compliance (trust signals)
- * - Integrated CTA (no gray footer)
- * - Full card clickable (Fitts's Law)
- * - No view count (removed noise)
- * - Max 1 divider (or use spacing only)
+ * - Minimal visual styling (no colored pills or emoji icons)
+ * - Clear typography hierarchy
+ * - Single blue accent color
+ * - Professional B2B aesthetic
+ * - Clean whitespace and simple text
+ * - Fast scanning (<3 seconds)
  *
- * Based on: Gemini + ChatGPT-5 + Claude feedback synthesis
+ * Based on user feedback: "Too busy, too many fancy stuffs"
  */
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 import {
-  formatCardPricingPill,
-  formatCardCompanySizePill,
-  formatCardFreeTrialPill,
-  getComplianceIcons,
+  formatPricingText,
+  formatCompanySizeText,
+  formatFreeTrialText,
+  getComplianceList,
   getCategoryLabel,
-  type CardPill
 } from '@/lib/utils/format-card-data-v2';
 import type { Tool } from '@/lib/airtable-helpers';
 
 interface ToolCardProps {
   tool: Tool;
   referrerSlug?: string;
-  // Legacy props for backward compatibility (ignored in v2 design)
+  // Legacy props for backward compatibility (ignored in v3 design)
   integrationPreview?: string[];
   showPricing?: boolean;
   variant?: 'default' | 'compact';
@@ -44,38 +40,43 @@ export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
     ? `/tools/${tool.slug}?from=${referrerSlug}`
     : `/tools/${tool.slug}`;
 
-  // Format data as pills
-  const pricingPill = formatCardPricingPill(
+  // Format metadata as plain text
+  const pricing = formatPricingText(
     tool.pricingAnnualMin,
     tool.pricingAnnualMax,
     tool.pricingCurrency
   );
 
-  const sizePill = formatCardCompanySizePill(tool.idealCompanySize);
+  const companySize = formatCompanySizeText(tool.idealCompanySize);
 
-  const trialPill = formatCardFreeTrialPill(
+  const trial = formatFreeTrialText(
     tool.freeTrialAvailable,
     tool.freeTrialDurationDays
   );
 
-  // Get compliance icons (max 3)
-  const complianceIcons = getComplianceIcons(
+  // Get compliance list
+  const complianceList = getComplianceList(
     tool.gdprCompliant,
     tool.eeocCompliant,
     tool.soc2Certified,
     tool.hipaaCompliant,
     tool.iso27001Certified
-  ).slice(0, 3); // Max 3 displayed
+  );
 
   // Get category label
   const categoryLabel = getCategoryLabel(tool.tags, tool.category);
 
+  // Build metadata line with bullet separators
+  const metadataItems = [pricing, companySize];
+  if (trial) metadataItems.push(trial);
+  const metadataLine = metadataItems.join('  •  ');
+
   return (
-    <div className="group relative flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-lg">
-      {/* HEADER: Logo (left) + Name + Category + Premium Badge */}
+    <div className="group relative flex flex-col rounded-lg border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-md">
+      {/* HEADER: Logo + Name + Category + Premium Badge */}
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="flex gap-3">
-          {/* Logo - Smaller, left-aligned */}
+          {/* Logo - 48px, left-aligned */}
           <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
             {tool.logoUrl ? (
               <Image
@@ -94,85 +95,48 @@ export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
 
           {/* Name + Category */}
           <div>
-            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-xl font-semibold text-gray-900 group-hover:text-gray-900">
               {tool.name}
             </h3>
-            <p className="text-xs font-medium text-blue-600 mt-0.5">
+            <p className="mt-1 text-sm font-medium text-blue-600">
               {categoryLabel}
             </p>
           </div>
         </div>
 
-        {/* Premium Badge - Top Right */}
+        {/* Premium Badge - Subtle text, top right */}
         {isPremium && (
-          <Badge
-            variant="secondary"
-            className="shrink-0 bg-amber-100 text-amber-700 hover:bg-amber-100 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5"
-          >
-            Featured
-          </Badge>
+          <span className="shrink-0 text-xs uppercase text-gray-500">
+            Premium
+          </span>
         )}
       </div>
 
-      {/* BODY: Benefit-First Description */}
-      <p className="mb-4 text-sm text-gray-600 line-clamp-2 leading-relaxed">
+      {/* DESCRIPTION */}
+      <p className="mb-4 text-base leading-relaxed text-gray-600 line-clamp-2">
         {tool.shortDescription || 'AI-powered HR solution for modern teams'}
       </p>
 
-      {/* META: Horizontal Pills (The Scanner) */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {/* Pricing Pill */}
-        <Pill pill={pricingPill} />
+      {/* METADATA LINE (pricing, size, trial) */}
+      <p className="mb-3 text-sm text-gray-500">
+        {metadataLine}
+      </p>
 
-        {/* Company Size Pill */}
-        <Pill pill={sizePill} />
+      {/* COMPLIANCE (if any) */}
+      {complianceList.length > 0 && (
+        <p className="mb-4 text-xs uppercase tracking-wide text-gray-400">
+          {complianceList.join('  •  ')}
+        </p>
+      )}
 
-        {/* Free Trial Pill (if available) */}
-        {trialPill && <Pill pill={trialPill} />}
+      {/* CTA - Right-aligned */}
+      <div className="mt-auto flex justify-end">
+        <span className="text-sm font-medium text-blue-600 group-hover:underline">
+          View Details →
+        </span>
       </div>
 
-      {/* FOOTER: Compliance Icons (left) + CTA (right) */}
-      <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-3">
-        {/* Compliance Icons - Compact */}
-        <div className="flex gap-3">
-          {complianceIcons.length > 0 ? (
-            complianceIcons.map((comp, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-1"
-                title={comp.tooltip}
-              >
-                <span className="text-sm">{comp.icon}</span>
-                <span className="text-[10px] font-medium text-gray-500">
-                  {comp.name}
-                </span>
-              </div>
-            ))
-          ) : (
-            <span className="text-[10px] text-gray-400">No compliance info</span>
-          )}
-        </div>
-
-        {/* CTA - Integrated (not in gray footer) */}
-        <div className="flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:underline">
-          View
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </div>
-      </div>
-
-      {/* Full Card Clickable Link (Fitts's Law) */}
+      {/* Full Card Clickable Link */}
       <Link
         href={detailUrl}
         className="absolute inset-0 z-10"
@@ -181,24 +145,5 @@ export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
         <span className="sr-only">View {tool.name} details</span>
       </Link>
     </div>
-  );
-}
-
-/**
- * Pill Component - Reusable for pricing, size, trial
- */
-function Pill({ pill }: { pill: CardPill }) {
-  const variantClasses = {
-    gray: 'bg-gray-100 text-gray-700',
-    blue: 'bg-blue-50 text-blue-700',
-    green: 'bg-green-50 text-green-700',
-    amber: 'bg-amber-50 text-amber-700'
-  };
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ${variantClasses[pill.variant]}`}>
-      {pill.icon && <span>{pill.icon}</span>}
-      {pill.text}
-    </span>
   );
 }
