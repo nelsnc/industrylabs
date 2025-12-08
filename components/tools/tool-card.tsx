@@ -1,207 +1,204 @@
-import Image from "next/image";
-import Link from "next/link";
+/**
+ * Tool Card Component v2.0
+ *
+ * Design Philosophy:
+ * - Logo-left horizontal layout (not centered banner)
+ * - Horizontal pill-based metadata (scannable left-to-right)
+ * - Benefit-first description (outcome-driven)
+ * - Icon-based compliance (trust signals)
+ * - Integrated CTA (no gray footer)
+ * - Full card clickable (Fitts's Law)
+ * - No view count (removed noise)
+ * - Max 1 divider (or use spacing only)
+ *
+ * Based on: Gemini + ChatGPT-5 + Claude feedback synthesis
+ */
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Building2, Shield, ArrowRight, Eye, DollarSign } from "lucide-react";
-import {
-  formatCardPricing,
-  formatCardCompanySize,
-  getTopComplianceBadges,
-  getAdditionalComplianceCount,
-  formatFreeTrial,
-  formatViewCount,
-  truncateDescription,
-} from "@/lib/utils/format-card-data";
-import type { Tool } from "@/lib/airtable-helpers";
-import { cn } from "@/lib/utils";
+  formatCardPricingPill,
+  formatCardCompanySizePill,
+  formatCardFreeTrialPill,
+  getComplianceIcons,
+  getCategoryLabel,
+  type CardPill
+} from '@/lib/utils/format-card-data-v2';
+import type { Tool } from '@/lib/airtable-helpers';
 
 interface ToolCardProps {
   tool: Tool;
-  integrationPreview?: string[]; // Optional: ["Workday", "BambooHR", "Slack"]
-  showPricing?: boolean; // Optional: hide pricing on certain pages
-  variant?: "default" | "compact"; // Optional: compact for grids
-  referrerSlug?: string; // Optional: for comparison tracking
+  referrerSlug?: string;
+  // Legacy props for backward compatibility (ignored in v2 design)
+  integrationPreview?: string[];
+  showPricing?: boolean;
+  variant?: 'default' | 'compact';
 }
 
-export function ToolCard({
-  tool,
-  integrationPreview = [],
-  showPricing = true,
-  variant = "default",
-  referrerSlug,
-}: ToolCardProps) {
+export function ToolCard({ tool, referrerSlug }: ToolCardProps) {
+  const isPremium = tool.tags?.includes('Premium');
+
   // Build detail URL with optional referrer for comparison tracking
   const detailUrl = referrerSlug
     ? `/tools/${tool.slug}?from=${referrerSlug}`
     : `/tools/${tool.slug}`;
 
-  // Format data using new utilities
-  const pricingDisplay = showPricing
-    ? formatCardPricing(tool.pricingAnnualMin, tool.pricingAnnualMax)
-    : null;
-  const companySizeDisplay = formatCardCompanySize(tool.idealCompanySize);
-  const description = truncateDescription(tool.shortDescription, 150);
-  const freeTrialDisplay = formatFreeTrial(
+  // Format data as pills
+  const pricingPill = formatCardPricingPill(
+    tool.pricingAnnualMin,
+    tool.pricingAnnualMax,
+    tool.pricingCurrency
+  );
+
+  const sizePill = formatCardCompanySizePill(tool.idealCompanySize);
+
+  const trialPill = formatCardFreeTrialPill(
     tool.freeTrialAvailable,
     tool.freeTrialDurationDays
   );
-  const viewCountDisplay = formatViewCount(tool.page_views);
 
-  // Build compliance array for easier filtering
-  const complianceList = [
-    tool.gdprCompliant && "GDPR",
-    tool.eeocCompliant && "EEOC",
-    tool.soc2Certified && "SOC2",
-  ].filter((badge): badge is string => Boolean(badge));
+  // Get compliance icons (max 3)
+  const complianceIcons = getComplianceIcons(
+    tool.gdprCompliant,
+    tool.eeocCompliant,
+    tool.soc2Certified,
+    tool.hipaaCompliant,
+    tool.iso27001Certified
+  ).slice(0, 3); // Max 3 displayed
 
-  const topCompliance = getTopComplianceBadges(complianceList);
-  const additionalComplianceCount = getAdditionalComplianceCount(complianceList);
+  // Get category label
+  const categoryLabel = getCategoryLabel(tool.tags, tool.category);
 
   return (
-    <Card
-      className={cn(
-        "flex flex-col h-full hover:shadow-lg transition-shadow border-gray-200",
-        variant === "compact" && "h-auto"
-      )}
-    >
-      {/* Header: Logo + Name + Premium Badge */}
-      <CardHeader className="space-y-4 pb-4">
-        <div className="flex items-start gap-4">
-          {/* Logo */}
-          {tool.logoUrl ? (
-            <div className="flex-shrink-0 w-14 h-14 relative rounded-lg overflow-hidden border border-gray-200 bg-white">
+    <div className="group relative flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-lg">
+      {/* HEADER: Logo (left) + Name + Category + Premium Badge */}
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="flex gap-3">
+          {/* Logo - Smaller, left-aligned */}
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
+            {tool.logoUrl ? (
               <Image
                 src={tool.logoUrl}
                 alt={`${tool.name} logo`}
-                fill
-                className="object-contain p-2"
+                width={48}
+                height={48}
+                className="h-full w-full object-contain p-1"
               />
-            </div>
-          ) : (
-            <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-500">
-                {tool.name[0]}
-              </span>
-            </div>
-          )}
-
-          {/* Name + Premium Badge */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 leading-tight">
-                {tool.name}
-              </h3>
-              {tool.tags.includes("Premium") && (
-                <Badge variant="default" className="bg-blue-600 text-xs shrink-0">
-                  Premium
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Description */}
-        {description && (
-          <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
-            {description}
-          </p>
-        )}
-      </CardHeader>
-
-      <Separator />
-
-      {/* Content: Key Info */}
-      <CardContent className="flex-1 space-y-4 py-4">
-        {/* Pricing Section */}
-        {pricingDisplay && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Pricing</span>
-            </div>
-            <div className="pl-6">
-              <div className="text-lg font-bold text-gray-900">
-                {pricingDisplay}
-              </div>
-              <div className="text-xs text-gray-500">per year</div>
-            </div>
-            {freeTrialDisplay && (
-              <div className="pl-6">
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-green-50 text-green-700 border-green-200"
-                >
-                  {freeTrialDisplay}
-                </Badge>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gray-50 text-xl font-bold text-gray-400">
+                {tool.name.charAt(0)}
               </div>
             )}
           </div>
-        )}
 
-        {/* Company Size Section */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Best for</span>
-          </div>
-          <div className="pl-6">
-            <div className="text-sm text-gray-900">{companySizeDisplay}</div>
+          {/* Name + Category */}
+          <div>
+            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+              {tool.name}
+            </h3>
+            <p className="text-xs font-medium text-blue-600 mt-0.5">
+              {categoryLabel}
+            </p>
           </div>
         </div>
 
-        {/* Compliance Section */}
-        {topCompliance.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Compliance</span>
-            </div>
-            <div className="pl-6 flex flex-wrap gap-2">
-              {topCompliance.map((badge) => (
-                <Badge
-                  key={badge}
-                  variant="outline"
-                  className="text-xs bg-green-50 text-green-700 border-green-200"
-                >
-                  {badge}
-                </Badge>
-              ))}
-              {additionalComplianceCount > 0 && (
-                <Badge variant="outline" className="text-xs text-gray-600">
-                  +{additionalComplianceCount} more
-                </Badge>
-              )}
-            </div>
-          </div>
+        {/* Premium Badge - Top Right */}
+        {isPremium && (
+          <Badge
+            variant="secondary"
+            className="shrink-0 bg-amber-100 text-amber-700 hover:bg-amber-100 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5"
+          >
+            Featured
+          </Badge>
         )}
-      </CardContent>
+      </div>
 
-      <Separator />
+      {/* BODY: Benefit-First Description */}
+      <p className="mb-4 text-sm text-gray-600 line-clamp-2 leading-relaxed">
+        {tool.shortDescription || 'AI-powered HR solution for modern teams'}
+      </p>
 
-      {/* Footer: CTA + Social Proof */}
-      <CardFooter className="pt-4 pb-4 flex items-center justify-between gap-3">
-        <Button asChild variant="default" className="flex-1 group">
-          <Link href={detailUrl}>
-            View Details
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </Button>
+      {/* META: Horizontal Pills (The Scanner) */}
+      <div className="mb-5 flex flex-wrap gap-2">
+        {/* Pricing Pill */}
+        <Pill pill={pricingPill} />
 
-        {/* View count */}
-        {viewCountDisplay && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 shrink-0">
-            <Eye className="w-3.5 h-3.5" />
-            <span>{viewCountDisplay}</span>
-          </div>
-        )}
-      </CardFooter>
-    </Card>
+        {/* Company Size Pill */}
+        <Pill pill={sizePill} />
+
+        {/* Free Trial Pill (if available) */}
+        {trialPill && <Pill pill={trialPill} />}
+      </div>
+
+      {/* FOOTER: Compliance Icons (left) + CTA (right) */}
+      <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-3">
+        {/* Compliance Icons - Compact */}
+        <div className="flex gap-3">
+          {complianceIcons.length > 0 ? (
+            complianceIcons.map((comp, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-1"
+                title={comp.tooltip}
+              >
+                <span className="text-sm">{comp.icon}</span>
+                <span className="text-[10px] font-medium text-gray-500">
+                  {comp.name}
+                </span>
+              </div>
+            ))
+          ) : (
+            <span className="text-[10px] text-gray-400">No compliance info</span>
+          )}
+        </div>
+
+        {/* CTA - Integrated (not in gray footer) */}
+        <div className="flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:underline">
+          View
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Full Card Clickable Link (Fitts's Law) */}
+      <Link
+        href={detailUrl}
+        className="absolute inset-0 z-10"
+        aria-label={`View details for ${tool.name}`}
+      >
+        <span className="sr-only">View {tool.name} details</span>
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * Pill Component - Reusable for pricing, size, trial
+ */
+function Pill({ pill }: { pill: CardPill }) {
+  const variantClasses = {
+    gray: 'bg-gray-100 text-gray-700',
+    blue: 'bg-blue-50 text-blue-700',
+    green: 'bg-green-50 text-green-700',
+    amber: 'bg-amber-50 text-amber-700'
+  };
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ${variantClasses[pill.variant]}`}>
+      {pill.icon && <span>{pill.icon}</span>}
+      {pill.text}
+    </span>
   );
 }
