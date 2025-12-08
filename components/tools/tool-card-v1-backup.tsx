@@ -64,6 +64,9 @@ export function ToolCard({
   const topCompliance = getTopComplianceBadges(complianceList);
   const additionalComplianceCount = getAdditionalComplianceCount(complianceList);
 
+  // Extract logo URL (handle string or Airtable attachment array)
+  const logoUrl = typeof tool.logoUrl === "string" ? tool.logoUrl : "";
+
   return (
     <Card
       className={cn(
@@ -75,10 +78,10 @@ export function ToolCard({
       <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start gap-4">
           {/* Logo */}
-          {tool.logoUrl ? (
+          {logoUrl ? (
             <div className="flex-shrink-0 w-14 h-14 relative rounded-lg overflow-hidden border border-gray-200 bg-white">
               <Image
-                src={tool.logoUrl}
+                src={logoUrl}
                 alt={`${tool.name} logo`}
                 fill
                 className="object-contain p-2"

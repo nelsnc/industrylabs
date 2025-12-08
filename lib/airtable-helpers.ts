@@ -14,7 +14,7 @@ export interface Tool {
   id: string;
   slug: string;
   name: string;
-  logoUrl?: string;
+  logoUrl?: string | { url?: string }[];
   shortDescription: string;
   category: string;
   pricing: string;
@@ -84,6 +84,10 @@ export interface Tool {
 
   // Analytics
   page_views?: number;
+
+  // Verification
+  verificationStatus?: string;
+  tier?: string;
 }
 
 /**
@@ -199,6 +203,10 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     // Analytics
     // Airtable Tool model uses camelCase (pageViews); keep snake_case for frontend compatibility
     page_views: airtableTool.pageViews ?? (airtableTool as { page_views?: number }).page_views,
+
+    // Verification
+    verificationStatus: airtableTool.verificationStatus,
+    tier: airtableTool.tier,
   };
 }
 

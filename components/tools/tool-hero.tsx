@@ -24,14 +24,17 @@ export function ToolHero({ tool }: ToolHeroProps) {
         })
       : null;
 
+  // Extract logo URL (handle string or Airtable attachment array)
+  const logoUrl = typeof tool.logoUrl === "string" ? tool.logoUrl : "";
+
   return (
     <div className="flex flex-col md:flex-row gap-8 items-start">
       {/* Logo */}
-      {tool.logoUrl && (
+      {logoUrl && (
         <div className="flex-shrink-0">
           <div className="w-24 h-24 relative rounded-lg overflow-hidden border border-gray-200">
             <Image
-              src={tool.logoUrl}
+              src={logoUrl}
               alt={`${tool.name} logo`}
               fill
               className="object-contain p-2"
