@@ -3,15 +3,9 @@ import type { Tool } from "@/lib/airtable-helpers";
 
 interface ToolGridProps {
   tools: Tool[];
-  integrationData?: Record<string, string[]>; // toolId -> integration names
-  variant?: "default" | "compact";
 }
 
-export function ToolGrid({
-  tools,
-  integrationData = {},
-  variant = "default",
-}: ToolGridProps) {
+export function ToolGrid({ tools }: ToolGridProps) {
   if (tools.length === 0) {
     return (
       <div className="text-center py-12">
@@ -26,8 +20,6 @@ export function ToolGrid({
         <ToolCard
           key={tool.id}
           tool={tool}
-          integrationPreview={integrationData[tool.id] || []}
-          variant={variant}
         />
       ))}
     </div>

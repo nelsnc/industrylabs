@@ -80,7 +80,6 @@ export async function ToolAlternatives({
             key={competitor.id}
             tool={competitor}
             referrerSlug={currentTool.slug}
-            showPricing={true}
           />
         ))}
       </div>
