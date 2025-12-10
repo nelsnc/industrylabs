@@ -41,14 +41,14 @@ const radicalVariants = [
 export default function TestVariantsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <div className="container mx-auto px-4 py-16 space-y-24">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 space-y-24">
         {/* Hero Header */}
         <div className="text-center space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
             <span>🎨</span>
             <span>16 Total Card Designs</span>
           </div>
-          <h1 className="text-6xl font-bold text-slate-900">
+          <h1 className="text-5xl md:text-6xl font-bold text-slate-900">
             Tool Card Design Gallery
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
@@ -57,10 +57,10 @@ export default function TestVariantsPage() {
         </div>
 
         {/* SELECTED FOR PRODUCTION - Highlighted Section */}
-        <section className="border-4 border-green-600 rounded-3xl p-8 bg-gradient-to-br from-green-50 to-blue-50 shadow-2xl">
-          <div className="flex items-center gap-3 mb-6">
+        <section className="border-4 border-green-600 rounded-3xl p-8 md:p-12 bg-gradient-to-br from-green-50 to-blue-50 shadow-2xl">
+          <div className="flex items-center gap-3 mb-8">
             <span className="text-4xl">🎯</span>
-            <h1 className="text-4xl font-bold text-slate-900">SELECTED FOR PRODUCTION</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">SELECTED FOR PRODUCTION</h1>
           </div>
 
           {/* Primary Choice - Hero Clean Card */}
@@ -69,12 +69,12 @@ export default function TestVariantsPage() {
               <span className="inline-flex items-center rounded-full bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
                 ✓ PRIMARY CHOICE
               </span>
-              <h2 className="text-3xl font-bold text-slate-900">Hero Clean Card</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Hero Clean Card</h2>
             </div>
-            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
               Large logo area with subtle gradient background • Clean, professional aesthetic • Premium badge top-right • Black CTA button
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <ToolCard tool={mockTool} variant="primary" />
               <ToolCard tool={{...mockTool, id: '2', freeTrialAvailable: false, name: 'Alternate Tool'}} variant="primary" />
               <ToolCard tool={{...mockTool, id: '3', name: 'Standard Tool', tier: undefined, tags: []}} variant="primary" />
@@ -87,12 +87,12 @@ export default function TestVariantsPage() {
               <span className="inline-flex items-center rounded-full bg-yellow-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
                 ⚡ BACKUP OPTION
               </span>
-              <h2 className="text-3xl font-bold text-slate-900">Gradient Alt Card</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Gradient Alt Card</h2>
             </div>
-            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
               Bold blue-to-purple gradient • White-on-color text • Icons for metadata • Modern, energetic feel
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <ToolCard tool={mockTool} variant="gradient-alt" />
               <ToolCard tool={{...mockTool, id: '4', freeTrialAvailable: false, name: 'Alternate Tool'}} variant="gradient-alt" />
               <ToolCard tool={{...mockTool, id: '5', name: 'Standard Tool', tier: undefined, tags: []}} variant="gradient-alt" />
@@ -140,7 +140,7 @@ export default function TestVariantsPage() {
 
             {/* Cards Display */}
             <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* Card with all features */}
                 <ToolCard
                   tool={mockTool}

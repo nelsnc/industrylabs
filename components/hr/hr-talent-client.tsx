@@ -50,18 +50,24 @@ export function HRTalentClient({
     <>
       {isDesktop ? (
         // Desktop: Inline collapsible sidebar
-        <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8">
+        <div className={cn(
+          isSidebarOpen
+            ? "grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8"
+            : "block"
+        )}>
           {/* Filters Sidebar */}
-          <aside className={cn(
-            "lg:sticky lg:top-20 h-fit",
-            "transition-all duration-300 ease-in-out"
-          )}>
-            <ToolFilters
-              isOpen={isSidebarOpen}
-              onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-              availableIntegrations={availableIntegrations}
-            />
-          </aside>
+          {isSidebarOpen && (
+            <aside className={cn(
+              "lg:sticky lg:top-20 h-fit",
+              "transition-all duration-300 ease-in-out"
+            )}>
+              <ToolFilters
+                isOpen={isSidebarOpen}
+                onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+                availableIntegrations={availableIntegrations}
+              />
+            </aside>
+          )}
 
           {/* Floating Filter Button (shows when sidebar closed) */}
           {!isSidebarOpen && (
@@ -168,12 +174,12 @@ function ContentSection({
       ) : (
         <div
           className={cn(
-            "grid gap-6",
+            "grid gap-8",
             "grid-cols-1",           // Mobile: 1 column
-            "sm:grid-cols-2",        // Small tablet (640px+): 2 columns
+            "md:grid-cols-2",        // Tablet (768px+): 2 columns
             isSidebarOpen
-              ? "lg:grid-cols-2 xl:grid-cols-3"  // Desktop with sidebar: 2-3 columns
-              : "lg:grid-cols-3 xl:grid-cols-4"  // Desktop no sidebar: 3-4 columns
+              ? "lg:grid-cols-2 xl:grid-cols-2"  // Desktop with sidebar: 2 columns
+              : "lg:grid-cols-3"                  // Desktop no sidebar: 3 columns
           )}
         >
           {filteredTools.map((tool) => (

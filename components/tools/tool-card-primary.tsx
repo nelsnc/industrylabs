@@ -36,54 +36,52 @@ export function ToolCardPrimary({ tool }: ToolCardPrimaryProps) {
     : 'All sizes';
 
   return (
-    <Link href={`/tools/${slug}`} className="group block h-full">
-      <div className="relative h-full flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-xl hover:-translate-y-1">
+    <Link href={`/tools/${slug}`}>
+      <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:shadow-xl">
 
         {/* Hero Section - Large Logo Area with Gradient Background */}
-        <div className="relative rounded-t-2xl bg-gradient-to-br from-slate-50 via-slate-100 to-slate-100 p-16 flex items-center justify-center min-h-[240px]">
+        <div className="relative h-48 w-full bg-gradient-to-br from-blue-50 via-purple-50 to-slate-100">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Image
+              src={logoSrc}
+              alt={name}
+              width={80}
+              height={80}
+              className="object-contain drop-shadow-lg"
+            />
+          </div>
 
           {/* Premium Badge - Absolute Top Right */}
           {isPremium && (
-            <div className="absolute top-4 right-4">
-              <span className="inline-flex items-center rounded-full bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white shadow-sm">
-                Premium
-              </span>
+            <div className="absolute top-3 right-3 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
+              Premium
             </div>
           )}
-
-          {/* Logo - Large, Centered */}
-          <div className="relative h-32 w-32">
-            <Image
-              src={logoSrc}
-              alt={`${name} logo`}
-              fill
-              className="object-contain"
-            />
-          </div>
         </div>
 
-        {/* Content Section - White Background */}
-        <div className="flex flex-1 flex-col p-6">
-
-          {/* Tool Name - Large, Bold */}
-          <h3 className="text-xl font-semibold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+        {/* Content Section - Minimal, Clean */}
+        <div className="p-5">
+          {/* Tool Name */}
+          <h3 className="text-lg font-semibold text-slate-900">
             {name}
           </h3>
 
-          {/* Description - 2 Lines Max, Relaxed Leading */}
-          <p className="text-slate-600 text-sm leading-relaxed line-clamp-2 mb-4 flex-1">
+          {/* Description - 2 Lines Max */}
+          <p className="mt-1 text-sm text-slate-600 line-clamp-2">
             {shortDescription}
           </p>
 
           {/* Metadata Row - Pricing & Company Size */}
-          <div className="flex items-center justify-between text-sm text-slate-500 mb-6 pt-2 border-t border-slate-100">
-            <span className="font-medium">{pricing || 'Contact for pricing'}</span>
+          <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+            <span>{pricing || 'Contact for pricing'}</span>
             <span>{companySizeDisplay}</span>
           </div>
 
-          {/* CTA Button - Black, Full Width, Rounded */}
-          <div className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white transition-all duration-200 group-hover:bg-slate-800 group-hover:shadow-lg">
-            View Full Profile
+          {/* CTA Button */}
+          <div className="mt-4">
+            <div className="w-full rounded-lg bg-slate-900 py-2 text-center text-sm font-medium text-white transition-colors group-hover:bg-slate-800">
+              View Full Profile
+            </div>
           </div>
         </div>
       </div>
