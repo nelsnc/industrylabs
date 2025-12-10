@@ -116,6 +116,7 @@ export interface ToolFields {
   tool_id?: number;
   tool_name: string;
   tool_slug: string;
+  vendor_id?: string[]; // Link to VENDORS table (v2.3 CORE FIELD)
   slug_source?: 'Manual' | 'Auto';
   tier: 'Free' | 'Premium';
   status: 'Draft' | 'Live' | 'Archived';
@@ -126,7 +127,7 @@ export interface ToolFields {
   short_description: string;
   long_description?: string;
   features_list?: string;
-  pricing_model?: 'Free' | 'Freemium' | 'Paid' | 'Enterprise';
+  pricing_model?: 'Per User' | 'Per Hire' | 'Flat Rate' | 'Custom' | 'Free' | 'Freemium' | 'Paid' | 'Enterprise'; // v2.3: Updated to match Pricing Engine spec
   starting_price?: number;
   pricing_details?: string;
   key_features?: string;
@@ -198,6 +199,7 @@ export interface Tool {
   id: string;
   name: string;
   slug: string;
+  vendorId?: string; // v2.3 CORE FIELD - resolved vendor ID from link
   tier: 'Free' | 'Premium';
   verificationStatus: 'Unverified' | 'Verified';
   primaryVertical: ToolFields['primary_vertical'];
@@ -528,6 +530,7 @@ function mapToolRecord(record: AirtableRecord<ToolFields>): Tool {
     id: record.id,
     name: fields.tool_name,
     slug: fields.tool_slug,
+    vendorId: fields.vendor_id?.[0], // Extract first vendor ID from linked records
     tier: fields.tier,
     verificationStatus: fields.verification_status,
     primaryVertical: fields.primary_vertical,

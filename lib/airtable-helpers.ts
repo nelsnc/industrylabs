@@ -14,10 +14,12 @@ export interface Tool {
   id: string;
   slug: string;
   name: string;
+  vendorId?: string; // v2.3 CORE FIELD - Link to VENDORS table
   logoUrl?: string | { url?: string }[];
   shortDescription: string;
   category: string;
   pricing: string;
+  pricingModel?: 'Per User' | 'Per Hire' | 'Flat Rate' | 'Custom' | 'Free' | 'Freemium' | 'Paid' | 'Enterprise'; // v2.3: Updated pricing model types
   tags: string[];
   companySizeFit?: string[];
   geography?: string[];
@@ -133,10 +135,12 @@ function mapAirtableToolToFrontend(airtableTool: AirtableToolType): Tool {
     id: airtableTool.id,
     slug: airtableTool.slug,
     name: airtableTool.name,
+    vendorId: airtableTool.vendorId, // v2.3 CORE FIELD
     logoUrl: airtableTool.logoUrl,
     shortDescription: airtableTool.shortDescription,
     category: airtableTool.primaryVertical, // Use primary vertical as category
     pricing,
+    pricingModel: airtableTool.pricingModel, // v2.3: Include pricing model
     tags,
     companySizeFit: airtableTool.companySizeFit,
     geography: airtableTool.supportedRegions || [],
