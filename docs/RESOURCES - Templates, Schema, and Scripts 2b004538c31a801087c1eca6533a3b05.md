@@ -235,6 +235,258 @@ industrylabs.ai
 
 ---
 
+### Template 1A-YC: YC Recent Grad - Initial Outreach (Tier 1: 70-85% Conversion)
+
+**Subject**: IndustryLabs partnership - [Tool Name] (YC [Batch])
+
+**Body**:
+
+```
+Hi [First Name],
+
+Congrats on launching [Tool Name] with YC [Batch]! I came across your product on [Product Hunt / YC directory / demo day], and I was impressed by [specific feature or traction metric].
+
+I'm building IndustryLabs - the first AI-native HR tool marketplace for mid-market companies (50-500 employees). Unlike G2/Capterra (which mix old HR software with new AI tools), we ONLY list tools founded 2020+ with AI/ML as their core capability.
+
+**Why I'm reaching out to YC grads specifically:**
+
+You're part of a cohort building the next generation of HR tech. Your batch-mates at [Name 1-2 other YC tools in HR] are already interested in being founding partners. We're creating a marketplace where emerging tools like yours can compete on innovation, not marketing budget.
+
+**What makes IndustryLabs different:**
+- **AI-native only**: If it wasn't built AI-first, it's not here (no BambooHR, ADP, Workday)
+- **Mid-market focus**: 50-500 employee companies (your ideal customer profile)
+- **Request Board**: Buyers post needs with full context (budget, timeline, company size, current stack, compliance) → we match to 2-3 vendors → you receive qualified leads, not anonymous clicks
+- **Curated 60-75 tools**: You're competing against 60 peers, not 5,000 on G2
+
+**Early Bird offer for YC grads:**
+- First 10 vendors: 3 months free, then £99/mo
+- Your cohort-mates: [Tool A], [Tool B] already signed up (or "considering")
+
+Premium includes:
+- Request Board lead notifications (email within 2 hours)
+- Enhanced tool page (AI capability description, screenshots, demo video)
+- Priority placement in category pages
+- Analytics dashboard
+
+Available for a quick 15-min call this week to show you the platform?
+
+Best,
+Nelson
+
+---
+Nelson Chen
+Founder, IndustryLabs
+industrylabs.ai
+```
+
+**Personalization Required**:
+- [YC Batch] (W25, S25, F25, X25, etc.)
+- [Specific feature or traction metric] (ideally from demo day, Product Hunt, or their site)
+- [Name 1-2 other YC tools] (social proof from their cohort)
+
+**When to Use**: YC grads from last 3 batches (W25, S25, F25, X25)
+
+**Expected Conversion**: 70-85% (highest tier)
+
+**Strategic Context**: See DEC-018 (Tier-Based Vendor Outreach Sequencing) - YC recent grads are Tier 1 targets with highest conversion probability due to strong product-market fit signals, modern tech stack, and growth mindset.
+
+---
+
+### Template 1B-SEED: Well-Funded Seed - Initial Outreach (Tier 1: 70-80% Conversion)
+
+**Subject**: IndustryLabs partnership - [Tool Name] (congrats on [$XM] raise)
+
+**Body**:
+
+```
+Hi [First Name],
+
+Congrats on your recent [$XM] raise! I saw the announcement on [TechCrunch / VentureBeat / company blog], and [specific comment about what impressed you].
+
+I'm building IndustryLabs - the first AI-native HR tool marketplace for mid-market companies (50-500 employees).
+
+**Why I'm reaching out now:**
+
+You just raised capital to scale GTM, and you're looking for efficient distribution channels. We send you qualified leads (with budget, timeline, company size, current stack) - not just clicks.
+
+**What makes us different from G2/Capterra:**
+- **AI-native only**: We exclude traditional HR software (BambooHR, ADP) - your competitors are other AI-first tools like you
+- **No pay-to-win**: Flat £99/mo (not PPC auctions). Your $[X]M raise doesn't go to Capterra bidding wars
+- **Request Board**: Buyers describe needs → we match to 2-3 tools → you receive qualified leads
+- **Mid-market ICP alignment**: Our buyers are 50-500 employee companies (your Series A target market)
+
+**Your GTM stage = our sweet spot:**
+
+You need early revenue traction before Series A. We're optimized for this:
+- Month 1: 3-5 qualified leads (free trial period)
+- Month 2-3: 8-12 leads/month (as buyer base grows)
+- £99/mo is impulse-buy territory (no exec approval needed)
+
+**Early Bird offer:**
+- 3 months free to prove ROI
+- If leads don't convert, cancel anytime
+
+Premium includes:
+- Request Board lead notifications
+- Enhanced tool page
+- Priority placement
+- Analytics to track lead quality
+
+Happy to show you the platform. 15 mins this week?
+
+Best,
+Nelson
+
+---
+Nelson Chen
+Founder, IndustryLabs
+industrylabs.ai
+```
+
+**Personalization Required**:
+- [$XM] (funding amount, e.g., "$9M")
+- [Source] (TechCrunch, company blog)
+- [Specific comment] (tie to their growth stage)
+
+**When to Use**: Tools that raised $3M-$20M in Seed/Series A (past 12-18 months)
+
+**Expected Conversion**: 70-80%
+
+**Strategic Context**: See DEC-016 (Tier-Based Financial Modeling) - Well-funded seed companies are Tier 1 targets with strong sales maturity and budget for early GTM investments.
+
+---
+
+### Template 1C-NICHE: Niche Specialist - Initial Outreach (Tier 2: 50-70% Conversion)
+
+**Subject**: IndustryLabs partnership - [Tool Name] ([niche expertise])
+
+**Body**:
+
+```
+Hi [First Name],
+
+I came across [Tool Name] while researching [specific niche, e.g., "construction workforce management"], and I was impressed by [specific feature or use case].
+
+I'm building IndustryLabs - the first AI-native HR tool marketplace for mid-market companies - and [Tool Name]'s focus on [niche] is exactly the kind of vertical specialization we want to highlight.
+
+**Why niche tools like yours need IndustryLabs:**
+
+Generic marketplaces like G2/Capterra treat you the same as all-in-one HR suites (Workday, BambooHR). But you're NOT competing with them - you're solving a specific problem for a specific buyer.
+
+**What we do differently:**
+- **Use-case taxonomy**: We have categories like "[specific use case your tool solves]" so buyers with that exact need find you
+- **Vertical context**: Your tool page explains "[niche problem]" so buyers understand why they need specialized software
+- **Request Board**: When a buyer says "I need [exact use case]", you're one of 2-3 matches (not buried on page 5 of G2)
+
+**Example Request Board match:**
+
+"200-person [industry] company, currently using [generic tool], need [specific capability your tool provides], budget $15K/year"
+
+→ We send you this lead with full context
+→ You pitch with niche expertise
+
+**Your niche = our positioning:**
+
+We're curating 60-75 AI-native tools (not 5,000 generic tools). Being "the [niche] specialist" is a strength here.
+
+**Early Bird offer:**
+- 3 months free to test lead quality
+- £99/mo after
+
+Premium includes:
+- Request Board leads for [niche use case]
+- Tool page with vertical context
+- Category placement under "[specific use case]"
+
+Would love to show you the platform. 15 mins this week?
+
+Best,
+Nelson
+
+---
+Nelson Chen
+Founder, IndustryLabs
+industrylabs.ai
+```
+
+**Personalization Required**:
+- [Niche expertise] (e.g., "construction", "frontline", "video interviewing")
+- [Specific feature or use case]
+- [Industry]
+- [Specific capability]
+
+**When to Use**: Tools focused on specific industries, use cases, or buyer personas
+
+**Expected Conversion**: 50-70% (Tier 2)
+
+**Strategic Context**: See DEC-015 (Curated 60-75 Tools Strategy) - Niche specialists are valued for depth over breadth, fitting our curation-focused positioning.
+
+---
+
+### Template 1D-GEO: UK/EU Geographic - Initial Outreach (Tier 2: 50-70% Conversion)
+
+**Subject**: IndustryLabs partnership - [Tool Name] (UK-based HR marketplace)
+
+**Body**:
+
+```
+Hi [First Name],
+
+I came across [Tool Name] while researching [UK / European / GDPR-compliant] HR tools, and I was impressed by [specific feature or local market focus].
+
+I'm building IndustryLabs - a UK-based, AI-native HR tool marketplace - and [Tool Name] is exactly the kind of European innovation that gets overlooked by US-centric marketplaces like G2/Capterra.
+
+**Why UK/EU tools need IndustryLabs:**
+
+Most HR marketplaces are built for US buyers ($ pricing, US compliance focus, US vendors dominate). European tools get buried even though they're often more innovative.
+
+**What we do differently:**
+- **UK-based**: £ pricing, GDPR-first positioning, European buyer focus
+- **GDPR compliance layer**: We surface GDPR-compliant tools first (competitive advantage vs US vendors)
+- **Mid-market focus**: UK companies 50-500 employees
+- **Request Board for EU buyers**: When a UK/EU buyer says "GDPR-critical, need [use case]", you're matched immediately
+
+**Geographic arbitrage:**
+
+US marketplaces charge $10K-50K/year and favor US vendors. We charge £99/mo and actively recruit European tools. Better placement for 1/10th the cost.
+
+**Your local market expertise = our positioning:**
+
+We highlight "[country]-based" and "GDPR-native" as competitive advantages.
+
+**Early Bird offer:**
+- 3 months free
+- £99/mo after
+- GDPR-first messaging on your tool page
+
+Premium includes:
+- Request Board leads (filtered for GDPR needs)
+- Geographic tagging
+- Compliance badges
+
+Available for a quick call this week?
+
+Best,
+Nelson
+
+---
+Nelson Chen
+Founder, IndustryLabs (UK-based)
+industrylabs.ai
+```
+
+**Personalization Required**:
+- [Country] (UK, France, Germany, Italy, etc.)
+- [Specific feature or local market focus]
+
+**When to Use**: Tools headquartered in UK/EU
+
+**Expected Conversion**: 50-70% (Tier 2)
+
+**Strategic Context**: See DEC-017 (Five Competitive Advantages Framework) - Geographic positioning leverages GDPR-first compliance layer as competitive differentiator.
+
+---
+
 ### Template 1B: Tier 2 Vendor - Initial Outreach (Growth-Stage Tools)
 
 **Subject**: Early partner opportunity - IndustryLabs
@@ -1010,6 +1262,8 @@ Building this in public – happy to answer questions or hear feedback.
 ---
 
 ## 8. COMMON OBJECTION RESPONSES
+
+**Note**: For tier-specific outreach strategies, see Templates 1A-YC, 1B-SEED, 1C-NICHE, 1D-GEO above, which address objections preemptively through targeted positioning.
 
 (unchanged logic, adapted as needed when you reply)
 

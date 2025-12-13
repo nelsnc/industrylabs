@@ -85,7 +85,7 @@ This document defines the complete data architecture for IndustryLabs. It serves
 
 - **Level 1 – Verticals**: HR & Talent, Learning & Development, Customer Support
 - **Level 2 – Categories**: Recruiting & ATS, Onboarding, Performance Management, etc.
-- Categories nest under Verticals via `parent_vertical` link
+- 12 HR categories defined (8 in HR & Talent, 4 in L&D, 4 in CS), categories nest under Verticals via `parent_vertical` link
 
 **Request Board Matching**: Geography-aware matching
 
@@ -540,16 +540,19 @@ COUNTA({tools})
 
 ```
 
-### Taxonomy Structure (Example)
+### Taxonomy Structure (12 HR Categories)
 
 ```
 VERTICALS (Level 1):
 ├── HR & Talent
 │   ├── Recruiting & ATS
-│   ├── Onboarding
+│   ├── Onboarding & Operations
 │   ├── Performance Management
 │   ├── Employee Engagement
-│   └── HR Analytics
+│   ├── HR Analytics & People Analytics
+│   ├── Compensation Management
+│   ├── HRIS & Payroll
+│   └── Diversity & Inclusion
 │
 ├── Learning & Development
 │   ├── Training Content Creation
@@ -564,6 +567,27 @@ VERTICALS (Level 1):
     └── Agent Assistance
 
 ```
+
+**12 HR Categories Detailed**:
+
+1. **Recruiting & ATS**: Sourcing, screening, applicant tracking, interview scheduling
+2. **Onboarding & Operations**: New hire workflows, documentation, equipment provisioning
+3. **Performance Management**: Goal setting, 1-on-1s, reviews, feedback loops
+4. **Employee Engagement**: Pulse surveys, recognition, culture initiatives
+5. **HR Analytics & People Analytics**: Workforce planning, turnover prediction, DEI metrics
+6. **Compensation Management**: Salary bands, equity management, benchmarking
+7. **HRIS & Payroll**: Core HR systems, payroll processing, benefits administration
+8. **Diversity & Inclusion**: Bias detection, inclusive hiring, pay equity analysis
+
+**Note**: Research Task 2 (Category Gap Analysis, December 2025) revealed current 55-tool portfolio is 84% Talent Acquisition focused. Target distribution for 60-75 tool portfolio:
+- Recruiting & ATS: 15-20 tools (largest category)
+- Performance Management: 8-10 tools
+- Employee Engagement: 8-10 tools
+- HR Analytics: 5-7 tools
+- Compensation: 6-8 tools
+- Onboarding: 6-8 tools
+- HRIS & Payroll: 6-8 tools
+- Diversity & Inclusion: 3-5 tools
 
 ---
 
