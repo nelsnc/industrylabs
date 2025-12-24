@@ -1,3 +1,0 @@
-# Covey — Sourcing & Talent Intelligence
-
-

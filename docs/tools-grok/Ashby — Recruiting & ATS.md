@@ -1,3 +1,0 @@
-# Ashby — Recruiting & ATS
-
-

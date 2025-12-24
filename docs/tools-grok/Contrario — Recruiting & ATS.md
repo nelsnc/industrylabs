@@ -1,3 +1,0 @@
-# Contrario — Recruiting & ATS
-
-

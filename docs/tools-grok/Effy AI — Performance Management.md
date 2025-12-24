@@ -1,3 +1,0 @@
-# Effy AI — Performance Management
-
-

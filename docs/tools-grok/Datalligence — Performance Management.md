@@ -1,3 +1,0 @@
-# Datalligence — Performance Management
-
-

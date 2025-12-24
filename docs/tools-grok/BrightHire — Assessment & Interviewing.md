@@ -1,3 +1,0 @@
-# BrightHire — Assessment & Interviewing
-
-

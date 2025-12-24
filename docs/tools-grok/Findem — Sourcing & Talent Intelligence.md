@@ -1,3 +1,0 @@
-# Findem — Sourcing & Talent Intelligence
-
-

@@ -1,3 +1,0 @@
-# Fetcher — Sourcing & Talent Intelligence
-
-

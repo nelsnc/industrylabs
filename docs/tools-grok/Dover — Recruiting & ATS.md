@@ -1,3 +1,0 @@
-# Dover — Recruiting & ATS
-
-
